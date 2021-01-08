@@ -54,6 +54,6 @@ docs:
 upload:
 	$(MAKE) -C $(src_dir) upload
 
-# upload wheels to pypi using twine
+# make live docs for testing
 livehtml:
 	$(MAKE) -C $(docs_dir) livehtml
