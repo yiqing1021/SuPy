@@ -45,7 +45,11 @@ logger_supy.setLevel(logging.INFO)
 ##############################################################################
 # 1. compact wrapper for loading SUEWS settings
 # @functools.lru_cache(maxsize=16)
-def init_supy(path_init: str, force_reload=True, check_input=False,) -> pd.DataFrame:
+def init_supy(
+    path_init: str,
+    force_reload=True,
+    check_input=False,
+) -> pd.DataFrame:
     """Initialise supy by loading initial model states.
 
     Parameters
@@ -130,7 +134,10 @@ def init_supy(path_init: str, force_reload=True, check_input=False,) -> pd.DataF
 # TODO:
 # to be superseded by a more generic wrapper: load_forcing
 def load_forcing_grid(
-    path_runcontrol: str, grid: int, check_input=False, force_reload=True
+    path_runcontrol: str,
+    grid: int,
+    check_input=False,
+    force_reload=True,
 ) -> pd.DataFrame:
     """Load forcing data for a specific grid included in the index of `df_state_init </data-structure/supy-io.ipynb#df_state_init:-model-initial-states>`.
 

@@ -15,8 +15,13 @@ from ._plot import plot_comp, plot_day_clm, plot_rsl
 from ._ohm import derive_ohm_coef, sim_ohm, replace_ohm_coeffs
 
 from ._atm import (
+    cal_cp,
+    cal_dens_air,
     cal_des_dta,
+    cal_dq,
+    cal_Lob,
     cal_rs_obs,
+    cal_ra_obs,
     cal_g_dq,
     cal_g_kd,
     cal_g_lai,
@@ -25,6 +30,10 @@ from ._atm import (
     cal_gs_mod,
     cal_gs_obs,
     calib_g,
+    fit_g_kd,
+    fit_g_smd,
+    fit_g_ta,
+    fit_g_dq,
 )
 from ._io import read_suews, read_forcing
 
