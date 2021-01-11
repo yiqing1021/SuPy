@@ -532,8 +532,9 @@ def resample_linear_avg(data_raw_avg, tstep_in, tstep_mod):
 
     # interpolation so to get the instantaneous values
     data_raw_tstep.loc[data_raw_shift.index] = data_raw_shift.values
+    data_raw_tstep = data_raw_tstep.asfreq(f"{tstep_mod}S")
     data_tstep = data_raw_tstep.interpolate("linear")
-    data_tstep = data_tstep.asfreq(f"{tstep_mod}S")
+
 
     # fill gaps with valid values
     data_tstep = data_tstep.copy().bfill().ffill().dropna(how="all")
@@ -554,7 +555,9 @@ def resample_forcing_met(
     data_met_raw = data_met_raw.copy()
     data_met_raw = data_met_raw.replace(-999, np.nan)
     # this line is kept for occasional debugging:
-    # data_met_raw.to_pickle("data_met_raw.pkl")
+    if logger_supy.level < 20:
+        data_met_raw.to_hdf("data_met_raw.h5", key="data_met_raw", mode="w")
+        logger_supy.debug(f"data_met_raw.h5 has been generated!")
 
     # linear interpolation:
     # the interpolation schemes differ between instantaneous and average values

@@ -21,7 +21,7 @@ setup(
     description="the SUEWS model that speaks python",
     long_description=readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/sunt05/SuPy",
+    url="https://github.com/UMEP-Dev/SuPy",
     author=", ".join(["Dr Ting Sun", "Dr Hamidreza Omidvar", "Prof Sue Grimmond",]),
     author_email=", ".join(
         [
