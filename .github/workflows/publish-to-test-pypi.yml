@@ -16,6 +16,7 @@ jobs:
 
     - name: Install pypa/build
       run: |
+        pip install pandas
         make
 
     - name: Publish distribution 📦 to Test PyPI
