@@ -36,6 +36,10 @@ main:
 	$(MAKE) -C $(src_dir) main
 	$(MAKE) -C $(docs_dir) html
 
+# build wheel
+wheel:
+	$(MAKE) -C $(src_dir) main
+
 # house cleaning
 clean:
 	$(MAKE) -C $(src_dir) clean
