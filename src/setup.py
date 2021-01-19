@@ -54,7 +54,7 @@ setup(
         "numdifftools", #required by `lmfit` for uncertainty estimation
         'pvlib',  # TMY-related solar radiation calculations
         "platypus-opt==1.0.4", # a multi-objective optimiser
-        "supy_driver==2020b10",  # a separate f2py-based driver
+        "supy_driver==2020b13",  # a separate f2py-based driver
     ],
     entry_points={
         #   command line tools
@@ -71,6 +71,7 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
         "Operating System :: MacOS :: MacOS X",
