@@ -57,7 +57,7 @@ def format_df_save(df_save):
     for var in df_save.columns[5:]:
         width_var_name = max([8, len(var)])
         df_save[var] = df_save[var].map(
-            lambda s: "{s:{c}>{n}.2f}".format(s=s, n=width_var_name, c=" ")
+            lambda s: f"{s:{' '}>{width_var_name}.4f}"
         )
 
     # format column names
