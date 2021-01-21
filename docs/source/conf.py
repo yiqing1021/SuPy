@@ -221,7 +221,7 @@ nbsphinx_prolog = r"""
         Interactive online version:
         :raw-html:`<a href="https://mybinder.org/v2/gh/sunt05/SuPy/master?filepath={{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge.svg" style="vertical-align:text-bottom"></a>`
         Slideshow:
-        :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/sunt05/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`s
+        :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/sunt05/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
 
         2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is prerequisite to a proper use of SuPy.
 
