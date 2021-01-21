@@ -192,7 +192,7 @@ rst_prolog = """
     .. note::
 
       1. Please report issues with this page on the `GitHub page`__.
-      2. A good understanding of [SUEWS](https://suews.readthedocs.org) is prerequisite to a proper use of SuPy.
+      2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is prerequisite to a proper use of SuPy.
 
     __ new_issue_
 
@@ -215,11 +215,15 @@ nbsphinx_prolog = r"""
 
     .. nbinfo::
 
-        This page was generated from `{{ docname }}`__.
+        Note
+
+        1. This page was generated from `{{ docname }}`__.
         Interactive online version:
         :raw-html:`<a href="https://mybinder.org/v2/gh/sunt05/SuPy/master?filepath={{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge.svg" style="vertical-align:text-bottom"></a>`
         Slideshow:
-        :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/sunt05/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
+        :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/sunt05/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`s
+
+        2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is prerequisite to a proper use of SuPy.
 
     __ https://github.com/sunt05/SuPy/blob/master/{{ docname }}
 

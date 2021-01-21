@@ -12,7 +12,7 @@ To familiarise users with SuPy urban climate modelling and to demonstrate the fu
   quick-start
   impact-studies
   external-interaction
-  AMF-sim
+  setup-own-site
 
 .. Note::
     1. The Anaconda distribution is suggested as the scientific Python 3 environment for its completeness in necessary packages. Please follow the official guide for its `installation <https://docs.anaconda.com/anaconda/install/>`__.
