@@ -191,7 +191,8 @@ rst_prolog = """
 
     .. note::
 
-      Please report issues with this page on the `GitHub page`__.
+      1. Please report issues with this page on the `GitHub page`__.
+      2. A good understanding of [SUEWS](https://suews.readthedocs.org) is prerequisite to a proper use of SuPy.
 
     __ new_issue_
 
@@ -390,6 +391,6 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
     'pandas': ('http://pandas.pydata.org/pandas-docs/stable/', None),
     'numpy': ('https://docs.scipy.org/doc/numpy/', None),
-    'suews': ('https://suews-docs.readthedocs.io/en/develop/', None),
+    'suews': ('https://suews.readthedocs.io/en/develop/', None),
     'lmfit': ('https://lmfit.github.io/lmfit-py/', None),
 }

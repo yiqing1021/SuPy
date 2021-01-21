@@ -28,7 +28,7 @@ supy version: {__version__}
 supy_driver version: {__version_driver__}
 
 Documentation sites:
-SUEWS: https://suews-docs.readthedocs.io/
+SUEWS: https://suews.readthedocs.io/
 SuPy: https://supy.readthedocs.io/
 ===========================================
     """

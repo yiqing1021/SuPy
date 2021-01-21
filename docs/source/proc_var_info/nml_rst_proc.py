@@ -39,7 +39,7 @@ SUEWS docs source: {url_repo_base}
 url_repo_input = URL(url_repo_base) / "input_files"
 
 dict_base = {
-        "docs": URL("https://suews-docs.readthedocs.io/en/latest/input_files/"),
+        "docs": URL("https://suews.readthedocs.io/en/latest/input_files/"),
         "github": url_repo_input,
     }
 
