@@ -122,8 +122,8 @@ def init_supy(
                 raise RuntimeError(
                     "{path_init_x} is NOT a valid file to initialise SuPy!"
                 )
-        else:
-            return df_state_init
+
+        return df_state_init
 
 
 # # TODO:
@@ -234,8 +234,8 @@ def load_forcing_grid(
                 )
         except:
             sys.exit()
-    else:
-        return df_forcing
+
+    return df_forcing
 
 
 # load sample data for quickly starting a demo run
