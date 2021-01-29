@@ -185,17 +185,17 @@ rst_prolog = """
 .. |NotAvail| replace:: **Not available in this version.**
 .. |NotUsed| replace:: **Not used in this version.**
 
-.. _new_issue : https://github.com/UMEP-dev/SuPy/issues/new?template=issue-report.md
 
 .. only:: html
 
     .. note::
 
-      1. Please report issues with this page on the `GitHub page`__.
+      1. Need help? Please let us know in the `UMEP Community`__.
       2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
     __ new_issue_
 
+.. _new_issue : https://github.com/UMEP-dev/UMEP/discussions/new
 
 """
 
