@@ -33,7 +33,7 @@ def subprocess_cmd(command):
 
 
 # run script to generate rst files for df_{group}
-# subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
+subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
 
 
 
