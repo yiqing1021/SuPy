@@ -33,7 +33,7 @@ def subprocess_cmd(command):
 
 
 # run script to generate rst files for df_{group}
-subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
+# subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
 
 
 
@@ -81,6 +81,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    "sphinx_comments",
     'IPython.sphinxext.ipython_directive',
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinx_click.ext',
@@ -92,6 +93,17 @@ extlinks = {
     'issue': ('https://github.com/UMEP-dev/SuPy/issues/%s', 'GH'),
     'pull': ('https://github.com/UMEP-dev/SuPy/pull/%s', 'PR'),
     'doi': ('http://dx.doi.org/%s', 'DOI: '),
+}
+
+# sphinx comments
+# https://sphinx-comments.readthedocs.io/
+comments_config = {
+   "hypothesis": True,
+   "utterances": {
+      "repo": "UMEP-dev/SuPy",
+      "issue-term":"title",
+    #   "optional": "config",
+   }
 }
 
 autosummary_generate = True
