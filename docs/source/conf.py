@@ -224,9 +224,12 @@ nbsphinx_prolog = r"""
         Slideshow:
         :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/UMEP-dev/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
 
-        1. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
+        2. Need help? Please let us know in the `UMEP Community`_.
+        3. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
     __ https://github.com/UMEP-dev/SuPy/blob/master/{{ docname }}
+
+    .. _UMEP Community : https://github.com/UMEP-dev/UMEP/discussions/new
 
 .. raw:: latex
 
