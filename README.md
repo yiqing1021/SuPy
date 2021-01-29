@@ -5,7 +5,6 @@
 [![Downloads](https://pepy.tech/badge/supy)](https://pepy.tech/project/supy)
 [![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/UMEP-dev/SuPy/master)
 
-[![Build Status](https://dev.azure.com/UMEP-dev/SuPy/_apis/build/status/sunt05.SuPy?branchName=master)](https://dev.azure.com/UMEP-dev/SuPy/_build/latest?definitionId=11?branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/supy/badge/?version=latest)](https://supy.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2574404.svg)](https://doi.org/10.5281/zenodo.2574404)
 
