@@ -192,7 +192,7 @@ rst_prolog = """
     .. note::
 
       1. Please report issues with this page on the `GitHub page`__.
-      2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is prerequisite to a proper use of SuPy.
+      2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
     __ new_issue_
 
@@ -223,7 +223,7 @@ nbsphinx_prolog = r"""
         Slideshow:
         :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/UMEP-dev/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
 
-        2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is prerequisite to a proper use of SuPy.
+        2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
     __ https://github.com/UMEP-dev/SuPy/blob/master/{{ docname }}
 
