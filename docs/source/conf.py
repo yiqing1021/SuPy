@@ -88,8 +88,8 @@ extensions = [
 ]
 
 extlinks = {
-    'issue': ('https://github.com/sunt05/SuPy/issues/%s', 'GH'),
-    'pull': ('https://github.com/sunt05/SuPy/pull/%s', 'PR'),
+    'issue': ('https://github.com/UMEP-dev/SuPy/issues/%s', 'GH'),
+    'pull': ('https://github.com/UMEP-dev/SuPy/pull/%s', 'PR'),
     'doi': ('http://dx.doi.org/%s', 'DOI: '),
 }
 
@@ -185,7 +185,7 @@ rst_prolog = """
 .. |NotAvail| replace:: **Not available in this version.**
 .. |NotUsed| replace:: **Not used in this version.**
 
-.. _new_issue : https://github.com/sunt05/SuPy/issues/new?template=issue-report.md
+.. _new_issue : https://github.com/UMEP-dev/SuPy/issues/new?template=issue-report.md
 
 .. only:: html
 
@@ -219,13 +219,13 @@ nbsphinx_prolog = r"""
 
         1. This page was generated from `{{ docname }}`__.
         Interactive online version:
-        :raw-html:`<a href="https://mybinder.org/v2/gh/sunt05/SuPy/master?filepath={{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge.svg" style="vertical-align:text-bottom"></a>`
+        :raw-html:`<a href="https://mybinder.org/v2/gh/UMEP-dev/SuPy/master?filepath={{ docname }}"><img alt="Binder badge" src="https://mybinder.org/badge.svg" style="vertical-align:text-bottom"></a>`
         Slideshow:
-        :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/sunt05/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
+        :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/UMEP-dev/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
 
         2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is prerequisite to a proper use of SuPy.
 
-    __ https://github.com/sunt05/SuPy/blob/master/{{ docname }}
+    __ https://github.com/UMEP-dev/SuPy/blob/master/{{ docname }}
 
 .. raw:: latex
 

@@ -3,9 +3,9 @@
 [![Python Version Support Status](https://img.shields.io/pypi/pyversions/supy.svg)](https://pypi.org/project/supy)
 [![Latest Version Status](https://img.shields.io/pypi/v/supy.svg)](https://pypi.org/project/supy)
 [![Downloads](https://pepy.tech/badge/supy)](https://pepy.tech/project/supy)
-[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sunt05/SuPy/master)
+[![Launch Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/UMEP-dev/SuPy/master)
 
-[![Build Status](https://dev.azure.com/sunt05/SuPy/_apis/build/status/sunt05.SuPy?branchName=master)](https://dev.azure.com/sunt05/SuPy/_build/latest?definitionId=11?branchName=master)
+[![Build Status](https://dev.azure.com/UMEP-dev/SuPy/_apis/build/status/sunt05.SuPy?branchName=master)](https://dev.azure.com/UMEP-dev/SuPy/_build/latest?definitionId=11?branchName=master)
 [![Documentation Status](https://readthedocs.org/projects/supy/badge/?version=latest)](https://supy.readthedocs.io/en/latest/?badge=latest)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2574404.svg)](https://doi.org/10.5281/zenodo.2574404)
 
@@ -46,7 +46,7 @@ ax.figure.savefig('sample_plot.png')
 
 The above code will produce a plot of surface energy balance components as follows:
 
-![sample plot](https://github.com/sunt05/SuPy/raw/master/sample_plot.png)
+![sample plot](https://github.com/UMEP-dev/SuPy/raw/master/sample_plot.png)
 
 ## Tutorial
 

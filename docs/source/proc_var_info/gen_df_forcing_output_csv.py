@@ -87,7 +87,7 @@ def gen_df_output(
         "SSss_DailyState.csv",
         "SSss_YYYY_snow_TT.csv",
         "SSss_YYYY_RSL_TT.csv",
-        "SSss_YYYY_SOLWEIG_TT.csv",
+        "SSss_YYYY_BEERS_TT.csv",
     ],
     url_base=url_repo_output,
 ) -> Path:

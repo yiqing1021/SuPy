@@ -16,16 +16,12 @@ SuPy: SUEWS that speaks Python
     :alt: Downloads
 
 .. image:: https://mybinder.org/badge_logo.svg
-    :target: https://mybinder.org/v2/gh/sunt05/SuPy/master
+    :target: https://mybinder.org/v2/gh/UMEP-dev/SuPy/master
     :alt: Binder Status
 
 .. image:: https://readthedocs.org/projects/supy/badge/?version=latest
     :target: https://supy.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-
-.. image:: https://dev.azure.com/sunt05/SuPy/_apis/build/status/sunt05.SuPy?branchName=master
-    :target: https://dev.azure.com/sunt05/SuPy/_build/latest?definitionId=11?branchName=master
-    :alt: Build Status
 
 .. image:: https://zenodo.org/badge/DOI/10.5281/zenodo.2574404.svg
    :target: https://doi.org/10.5281/zenodo.2574404
@@ -71,8 +67,8 @@ SuPy: SUEWS that speaks Python
 
 - **How to contribute to SuPy?**
 
-    * Add your development via `Pull Request <https://github.com/sunt05/SuPy/compare>`_
-    * Report issues via the `GitHub page <https://github.com/sunt05/SuPy/issues/new?template=issue-report.md>`_.
+    * Add your development via `Pull Request <https://github.com/UMEP-dev/SuPy/compare>`_
+    * Report issues via the `GitHub page <https://github.com/UMEP-dev/SuPy/issues/new?template=issue-report.md>`_.
     * Cite `our SuPy paper <https://doi.org/10.5194/gmd-12-2781-2019>`_.
     * Provide suggestions and feedback.
 
