@@ -12,6 +12,7 @@ import os
 import platform
 import subprocess
 import sys
+import urllib
 
 import supy
 
@@ -32,7 +33,7 @@ def subprocess_cmd(command):
 
 
 # run script to generate rst files for df_{group}
-subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
+# subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
 
 
 
@@ -188,14 +189,14 @@ rst_prolog = """
 
 .. only:: html
 
-    .. note::
+    .. tip::
 
-      1. Need help? Please let us know in the `UMEP Community`__.
-      2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
+      1. Need help? Please let us know in the `UMEP Community`_.
+      2. Find an issue within this page? Please report it in the `GitHub issues`_.
+      3. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
-    __ new_issue_
 
-.. _new_issue : https://github.com/UMEP-dev/UMEP/discussions/new
+.. _UMEP Community : https://github.com/UMEP-dev/UMEP/discussions/new
 
 """
 
@@ -223,7 +224,7 @@ nbsphinx_prolog = r"""
         Slideshow:
         :raw-html:`<a href="https://nbviewer.jupyter.org/format/slides/github/UMEP-dev/SuPy/blob/master/{{ docname }}"><img alt="Binder badge" src="https://img.shields.io/badge/render-nbviewer-orange.svg" style="vertical-align:text-bottom"></a>`
 
-        2. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
+        1. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
     __ https://github.com/UMEP-dev/SuPy/blob/master/{{ docname }}
 
@@ -398,3 +399,50 @@ intersphinx_mapping = {
     'suews': ('https://suews.readthedocs.io/en/develop/', None),
     'lmfit': ('https://lmfit.github.io/lmfit-py/', None),
 }
+
+html_context = {
+    "display_github": True,  # Integrate GitHub
+    "github_user": "UMEP-dev",  # Username
+    "github_repo": "SuPy",  # Repo name
+    "github_version": "master",  # Version
+    "conf_py_path": "/source/",  # Path in the checkout to the docs root
+}
+
+def source_read_handler(app, docname, source):
+    if app.builder.format != "html":
+        return
+    src = source[0]
+    # base location for `docname`
+    if ('"metadata":' in src) and ('"nbformat":' in src):
+        # consider this as an ipynb
+        # and do nothing
+        return
+
+    # modify the issue link to provide page specific URL
+    str_base = "docs/source"
+    str_repo = html_context["github_repo"]
+
+    # encode body query to be URL compliant
+    str_body = f"""## Issue
+<!-- Please describe the issue below this line -->
+
+## Links
+[source doc](https://github.com/UMEP-dev/{str_repo}/blob/master/{str_base}/{docname}.rst)
+[RTD page](https://suews.readthedocs.org/en/latest/{docname}.html)
+"""
+    str_query_body = urllib.parse.urlencode({"body": str_body})
+    str_url = f"https://github.com/UMEP-dev/{str_repo}/issues/new?assignees=&labels=docs&template=docs-issue-report.md&{str_query_body}&title=[Docs]{docname}"
+    str_GHPage = f"""
+.. _GitHub Issues: {str_url}
+"""
+    rendered = "\n".join([str_GHPage, src])
+    source[0] = rendered.rstrip("\n")
+
+
+# Fix for scrolling tables in the RTD-theme
+# https://rackerlabs.github.io/docs-rackspace/tools/rtd-tables.html
+def setup(app):
+    app.connect("source-read", source_read_handler)
+    app.add_css_file("theme_overrides.css")
+    # Fix equation formatting in the RTD-theme
+    app.add_css_file("fix-eq.css")
