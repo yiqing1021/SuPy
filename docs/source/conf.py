@@ -33,7 +33,7 @@ def subprocess_cmd(command):
 
 
 # run script to generate rst files for df_{group}
-# subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
+subprocess_cmd('cd proc_var_info; python3 gen_rst.py')
 
 
 # -- Project information -----------------------------------------------------
@@ -98,7 +98,6 @@ comments_config = {
     "utterances": {
         "repo": "UMEP-dev/SuPy",
         "issue-term": "title",
-        "label": "docs",
         #   "optional": "config",
     },
 }
@@ -205,7 +204,7 @@ rst_prolog = """
       3. A good understanding of `SUEWS <https://suews.readthedocs.org>`_ is a prerequisite to the proper use of SuPy.
 
 
-.. _UMEP Community : https://github.com/UMEP-dev/UMEP/discussions/new
+.. _UMEP Community : https://github.com/UMEP-dev/UMEP/discussions/
 
 """
 
