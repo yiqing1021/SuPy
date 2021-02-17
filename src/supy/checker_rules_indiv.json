@@ -998,7 +998,7 @@
         "logic": "range",
         "param": {
             "max": 1300,
-            "min": 800
+            "min": 680
         },
         "unit": "hPa"
     },
