@@ -647,7 +647,7 @@ def gen_forcing_era5(
     grid : list, optional
         grid size used in CDS request API, by default [0.125, 0.125].
     hgt_agl_diag: float
-        height above ground level to diagnose forcing variables, by default 0; the ground level is taken from ERA5 grid altitude.
+        height above ground level to diagnose forcing variables, by default 100; the ground level is taken from ERA5 grid altitude.
     scale : int, optional
         scaling factor that determines the area of interest (i.e., `area=grid[0]*scale`),
         by default 0
@@ -677,7 +677,8 @@ def gen_forcing_era5(
         Reference
         ---------
             ECMWF, S. P. (2016). In IFS documentation CY41R2 Part IV: Physical Processes. ECMWF: Reading, UK, 111-113. https://www.ecmwf.int/en/elibrary/16648-part-iv-physical-processes
-
+        
+        4. For `start`/`end`, it is recommended to use the format `YYYY-MM-DD` to avoid confusion in day/month-first convensions (`an upstream known issue <https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html#pandas.to_datetime>`_ due to the `dateutil` behavior)
     """
     import xarray as xr
 
