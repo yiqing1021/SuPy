@@ -9,8 +9,10 @@
 # TS, 21 May 2019: integrated into supy
 ########################################################
 # %%
+import os
 import os.path
 import sys
+
 # ignore warnings raised by numpy when reading-in -9 lines
 import warnings
 from collections import defaultdict
@@ -23,6 +25,7 @@ from tempfile import TemporaryDirectory
 import f90nml
 import numpy as np
 import pandas as pd
+from chardet import detect
 
 from .._env import logger_supy, path_supy_module
 from .._load import load_SUEWS_nml
@@ -151,25 +154,45 @@ def delete_var_nml(toFile, toVar, toVal):
 # add:
 # add variable(s) to a file
 def add_var(toFile, toVar, toCol, toVal):
-    # toFile missing
-    if not (os.path.isfile(toFile)):
-        # create toFile
-        dataX = [1]
-        np.savetxt(
-            toFile, dataX, header="1\nCode", footer="-9\n-9", fmt="%s", comments=""
-        )
+
+    # # toFile missing
+    # if not (os.path.isfile(toFile)):
+    #     print(toFile, "is a new file")
+    #     # create toFile
+    #     dataX = np.array([1, -9, -9]).reshape(3, -1)
+    #     df_base = pd.DataFrame(
+    #         dataX, columns=pd.MultiIndex.from_product(([1], ["Code"]))
+    #     )
+    #     print(df_base)
+    #     df_base.to_csv(
+    #         toFile,
+    #         sep=" ",
+    #         float_format="%10.4f",
+    #         quotechar=" ",
+    #         # index=False,
+    #     )
+
+    #     print(df_base)
+    #     print(Path(toFile).read_text())
 
     # if namelist:
     if toFile.endswith(".nml"):
         add_var_nml(toFile, toVar, toVal)
     else:
         # load original data from toFile
-        dataX = pd.read_csv(toFile, header=1, delim_whitespace=True, comment="!",)
+        dataX = pd.read_csv(
+            toFile,
+            header=1,
+            delim_whitespace=True,
+            comment="!",
+        )
         # construct new column
         colNew = np.empty(dataX.shape[0], dtype=np.object)
         colNew = toVal
         # insert new column
-        dataX.insert(int(toCol) - 1, toVar, colNew)
+        dataX.insert(
+            loc=int(toCol) - 1, column=toVar, value=colNew, allow_duplicates=True
+        )
         # save new file
         ind = np.arange(dataX.shape[1]) + 1
         col_name = dataX.columns
@@ -179,7 +202,11 @@ def add_var(toFile, toVar, toCol, toVal):
         dataX.iloc[-2:, 0] = -9
         dataX.iloc[:, 0] = dataX.iloc[:, 0].astype(int)
         dataX.to_csv(
-            toFile, sep=" ", float_format="%10.4f", quotechar=" ", index=False,
+            toFile,
+            sep=" ",
+            float_format="%10.4f",
+            quotechar=" ",
+            index=False,
         )
 
 
@@ -221,7 +248,7 @@ def SUEWS_Converter_single(fromDir, toDir, fromVer, toVer):
             np.array(rules.loc[:, ["From", "To"]].values.tolist()) == [fromVer, toVer]
         )[0]
     )
-    filesToConvert = set(rules["File"][posRules])-{'-999'}
+    filesToConvert = set(rules["File"][posRules]) - {"-999"}
     # print('posRules', posRules,
     #       rules.loc[:, ['From', 'To']],
     #       np.array(rules.loc[:, ['From', 'To']].values),
@@ -266,7 +293,7 @@ def SUEWS_Converter_file(fileX, actionList):
     # dtype size
     todoList = todoList[np.lexsort((todoList[:, 4].astype(int), todoList[:, 0]))][:, 1:]
     if not Path(fileX).exists():
-        Path(fileX).write_text('Code\n800\n', encoding="UTF8")
+        Path(fileX).write_text("1\nCode\n800\n-9\n-9\n", encoding="UTF8")
 
     if not fileX.endswith("-999"):
         logger_supy.info(f"working on {fileX} in {get_encoding_type(fileX)}")
@@ -369,7 +396,7 @@ def convert_table(fromDir, toDir, fromVer, toVer):
         # copy flattened files into tempDir_1 for later processing
         # also convert all files to UTF-8 encoding in case inconsistent encoding exists
         for fileX in list_table_input:
-            print(fileX)
+            # print(fileX)
             path_dst = Path(tempDir_1) / fileX.name
             copyfile(fileX.resolve(), path_dst)
 
@@ -423,9 +450,6 @@ def convert_table(fromDir, toDir, fromVer, toVer):
         move(fileX.resolve(), path_input / fileX.name)
 
 
-import os
-from chardet import detect
-
 # get file encoding type
 def get_encoding_type(file):
     with open(file, "rb") as f:
@@ -458,4 +482,3 @@ def convert_utf8(file_src):
             logger_supy.error("Decode Error")
         except UnicodeEncodeError:
             logger_supy.error("Encode Error")
-
