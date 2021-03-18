@@ -20,21 +20,34 @@ from ._atm import (
     cal_des_dta,
     cal_dq,
     cal_Lob,
-    cal_rs_obs,
     cal_ra_obs,
+)
+
+from ._gs import (
+    cal_rs_obs,
     cal_g_dq,
+    cal_g_dq_noah,
     cal_g_kd,
+    cal_g_kd_noah,
     cal_g_lai,
     cal_g_smd,
+    cal_g_swc_noah,
     cal_g_ta,
-    cal_gs_mod,
+    cal_g_ta_noah,
+    cal_gs_suews,
     cal_gs_obs,
     calib_g,
     fit_g_kd,
     fit_g_smd,
     fit_g_ta,
     fit_g_dq,
+    deriv_g_kd_noah,
+    deriv_g_smd_noah,
+    deriv_g_ta_noah,
+    deriv_g_dq_noah,
+
 )
+
 from ._io import read_suews, read_forcing
 
 from ._wrf import extract_reclassification, plot_reclassification
