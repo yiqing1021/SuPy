@@ -354,7 +354,7 @@ def cal_gs_suews(
         Leaf area index [m2 m-2]
     g_cst : size-6 array
         Parameters to determine surface conductance/resistance:
-        g_lai (LAI related), g2 (solar radiation related),
+        g_lai (LAI related), g_kd (solar radiation related),
         g_dq_base (humidity related), g_dq_shape (humidity related),
         g_ta (air temperature related),
         g_smd (soil moisture related)

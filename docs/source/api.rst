@@ -64,7 +64,7 @@ Surface Conductance
 .. autosummary::
     :toctree: api/supy.util
 
-    cal_gs_mod
+    cal_gs_suews
     cal_gs_obs
     calib_g
 
