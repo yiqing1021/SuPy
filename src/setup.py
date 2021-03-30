@@ -38,23 +38,23 @@ setup(
     # distclass=BinaryDistribution,
     ext_modules=[],
     install_requires=[
-        "pandas>=0.25.1",
-        "tables",  # for dumping in hdf5
-        "scipy",
-        "dask",  # needs dask for parallel tasks
-        "f90nml",
+        "pandas>=1.1",
         "matplotlib",
-        "seaborn",
+        "scipy",
+        "tables",  # for dumping in hdf5
+        "dask",  # needs dask for parallel tasks
+        "f90nml", # utility for namelist files
+        "seaborn", # stat plotting
         "atmosp",  # my own `atmosp` module forked from `atmos-python`
-        "cdsapi",
-        "xarray",
+        "cdsapi", # ERA5 data
+        "xarray", # utility for high-dimensional datasets
         "multiprocess", # a better multiprocessing library
         "click",  # cmd tool
         "lmfit",  # optimiser
         "numdifftools", #required by `lmfit` for uncertainty estimation
         'pvlib',  # TMY-related solar radiation calculations
         "platypus-opt==1.0.4", # a multi-objective optimiser
-        "supy_driver==2020b16",  # a separate f2py-based driver
+        "supy_driver==2020b17",  # a separate f2py-based driver
     ],
     entry_points={
         #   command line tools
