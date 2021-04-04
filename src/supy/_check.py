@@ -42,18 +42,25 @@ def check_range(ser_to_check: pd.Series, rule_var: dict) -> Tuple:
     min_v = -np.inf if isinstance(min_v, str) else min_v
     max_v = np.inf if isinstance(max_v, str) else max_v
     description = ""
-    is_accepted_flag = False
+    is_accepted_flag = True
 
-    for ind, value in ser_to_check.items():
-        if min_v <= value <= max_v:
-            is_accepted_flag = True
-        elif value == -999.0:
-            # default `na` value as such option is unnecessary in SUEWS
-            is_accepted_flag = True
-        else:
-            is_accepted_flag = False
-            description = f"`{var}` should be between [{min_v}, {max_v}] but `{value}` is found at {ind}"
-            break
+    # for ind, value in ser_to_check.items():
+    #     if min_v <= value <= max_v:
+    #         is_accepted_flag = True
+    #     elif value == -999.0:
+    #         # default `na` value as such option is unnecessary in SUEWS
+    #         is_accepted_flag = True
+    #     else:
+    #         is_accepted_flag = False
+    #         description = f"`{var}` should be between [{min_v}, {max_v}] but `{value}` is found at {ind}"
+    #         break
+    ser_flag = ~ser_to_check.replace(-999.0, np.nan).dropna().between(min_v, max_v)
+    n_flag = ser_flag.sum()
+    if ser_flag.sum() > 0:
+        is_accepted_flag = False
+        ind = ser_flag.index[ser_flag]
+        ind = [ser_flag.index.get_loc(x) for x in ind]
+        description = f"`{var}` should be between [{min_v}, {max_v}] but {n_flag} outliers are found at:\n {ind}"
 
     if not is_accepted_flag:
         is_accepted = is_accepted_flag
@@ -110,7 +117,9 @@ def check_method(ser_to_check: pd.Series, rule_var: dict) -> Tuple:
 list_col_forcing = list(dict_var_type_forcing.keys())
 
 
-def check_forcing(df_forcing: pd.DataFrame):
+def check_forcing(df_forcing: pd.DataFrame, fix=False):
+    if fix:
+        df_forcing_fix = df_forcing.copy()
     logger_supy.info("SuPy is validating `df_forcing`...")
     # collect issues
     list_issues = []
@@ -165,17 +174,28 @@ def check_forcing(df_forcing: pd.DataFrame):
     # 3. valid physical ranges
     for var in col_df:
         if var not in ["iy", "id", "it", "imin", "isec"]:
-            ser_var = df_forcing[var]
+            ser_var = df_forcing.loc[:, var].copy()
             res_check = check_range(ser_var, dict_rules_indiv)
             if not res_check[1]:
                 str_issue = res_check[2]
                 list_issues.append(str_issue)
                 flag_valid = False
+                if fix:
+                    var_check = var.lower()
+                    min_v = dict_rules_indiv[var_check]["param"]["min"]
+                    max_v = dict_rules_indiv[var_check]["param"]["max"]
+                    ser_var = ser_var.where(ser_var < max_v, max_v).copy()
+                    ser_var = ser_var.where(ser_var > min_v, min_v).copy()
+                    df_forcing_fix.loc[:, var] = ser_var.values
 
     if not flag_valid:
         str_issue = "\n".join(["Issues found in `df_forcing`:"] + list_issues)
-        logger_supy.error(str_issue)
-        return list_issues
+        if not fix:
+            logger_supy.error(str_issue)
+            return list_issues
+        else:
+            logger_supy.info("detected issues have been fixed by clipping off outliers")
+            return df_forcing_fix
     else:
         logger_supy.info("All checks for `df_forcing` passed!")
 
