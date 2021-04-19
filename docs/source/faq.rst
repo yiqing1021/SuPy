@@ -82,7 +82,7 @@ but unfortunately they might happen in some edge cases.
 Please `report such issues to us`__ with your input files for debugging.
 Thanks!
 
-__ new_issue_
+__ GitHub Issues_
 
 
 How can I upgrade SuPy to an up-to-date version?
