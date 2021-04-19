@@ -94,4 +94,9 @@ Run the following code in your terminal:
     python3 -m pip install supy --upgrade
 
 
+How to deal with ``KeyError`` when trying to load initial model states?
+-----------------------------------------------------------------------
+
+Please see :issue:`28`
+
 
