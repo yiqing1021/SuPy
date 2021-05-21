@@ -1,0 +1,35 @@
+.. _new_latest:
+.. _new_dev:
+
+Version 2021.5.21dev
+======================================================
+
+
+- **New**
+
+  1. Update supy-driver to `2021a` iteration.
+
+
+- **Improvement**
+
+  1. a new method for calculating roughness length for momentum and displacement height (`roughlenmommethod=4`) based on plan area index as illustrated in figure 1a of GO99.
+
+- **Changes**
+
+  None.
+
+
+- **Fix**
+
+  None.
+
+
+- **Known issue**
+
+  1. ESTM is not supported yet.
+  2. BLUEWS, a CBL modules in SUEWS, is not supported yet.
+  3. Simulation in parallel mode is NOT supported on Windows
+     due to system limitation.
+
+
+
