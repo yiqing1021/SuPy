@@ -11,8 +11,7 @@ def readme():
         with open("../README.md", encoding="utf-8") as f:
             return f.read()
     except:
-        return f'SuPy package'
-
+        return f"SuPy package"
 
 
 setup(
@@ -22,7 +21,13 @@ setup(
     long_description=readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/UMEP-Dev/SuPy",
-    author=", ".join(["Dr Ting Sun", "Dr Hamidreza Omidvar", "Prof Sue Grimmond",]),
+    author=", ".join(
+        [
+            "Dr Ting Sun",
+            "Dr Hamidreza Omidvar",
+            "Prof Sue Grimmond",
+        ]
+    ),
     author_email=", ".join(
         [
             "ting.sun@reading.ac.uk",
@@ -33,7 +38,13 @@ setup(
     license="GPL-V3.0",
     packages=["supy"],
     package_data={
-        "supy": ["sample_run/*", "sample_run/Input/*", "*.json", "util/*", "cmd/*",]
+        "supy": [
+            "sample_run/*",
+            "sample_run/Input/*",
+            "*.json",
+            "util/*",
+            "cmd/*",
+        ]
     },
     # distclass=BinaryDistribution,
     ext_modules=[],
@@ -41,21 +52,25 @@ setup(
         "pandas>=1.1",
         "matplotlib",
         "scipy",
-        "tables",  # for dumping in hdf5
         "dask",  # needs dask for parallel tasks
-        "f90nml", # utility for namelist files
-        "seaborn", # stat plotting
+        "f90nml",  # utility for namelist files
+        "seaborn",  # stat plotting
         "atmosp",  # my own `atmosp` module forked from `atmos-python`
-        "cdsapi", # ERA5 data
-        "xarray", # utility for high-dimensional datasets
-        "multiprocess", # a better multiprocessing library
+        "cdsapi",  # ERA5 data
+        "xarray",  # utility for high-dimensional datasets
+        "multiprocess",  # a better multiprocessing library
         "click",  # cmd tool
         "lmfit",  # optimiser
-        "numdifftools", #required by `lmfit` for uncertainty estimation
-        'pvlib',  # TMY-related solar radiation calculations
-        "platypus-opt==1.0.4", # a multi-objective optimiser
+        "numdifftools",  # required by `lmfit` for uncertainty estimation
+        "pvlib",  # TMY-related solar radiation calculations
+        "platypus-opt==1.0.4",  # a multi-objective optimiser
         "supy_driver==2021a2",  # a separate f2py-based driver
     ],
+    extras_require={
+        "hdf": [
+            "tables",  # for dumping in hdf5
+        ]
+    },
     entry_points={
         #   command line tools
         "console_scripts": [
