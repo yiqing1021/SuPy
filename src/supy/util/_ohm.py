@@ -16,13 +16,30 @@ from .._env import logger_supy
 
 # Linear fitting of QS, QN, deltaQN/dt (entire timeseries)
 def derive_ohm_coef(ser_QS, ser_QN):
-    """A function to linearly fit two independant variables to a dependent one.
-    Input params: QS_Ser: The dependent variable QS (Surface heat storage). Pandas Series.
-                  QN_Ser: The first independent variable (Net all wave radiation). Pandas Series.
-                  dt: The time interval with which the rate of change of QN is calculated. Float (hours).
-    Returns: a1, a2 coefficients and a3 (intercept)
     """
+    A function to linearly fit two independant variables to a dependent one.
+    Input params: QS_Ser:
+                    QN_Ser: The first independent variable (Net all wave radiation). Pandas Series.
+    Returns: a1, a2 coefficients and a3 (intercept)
+
+
+    Parameters
+    ----------
+    ser_QS : pd.Series
+        The dependent variable QS (Surface heat storage).
+    ser_QN : pd.Series
+        The first independent variable (Net all wave radiation).
+
+    Returns
+    -------
+    Tuple
+        a1, a2 coefficients and a3 (intercept)
+    """
+
+
+
     from sklearn.linear_model import LinearRegression
+
     # derive dt in hours
     dt_hr = ser_QN.index.freq / pd.Timedelta("1H")
 
@@ -58,30 +75,48 @@ def derive_ohm_coef(ser_QS, ser_QN):
     return a1, a2, a3
 
 
-def replace_ohm_coeffs(df_state_init, coefs, land_cover_type):
+def replace_ohm_coeffs(df_state, coefs, land_cover_type):
     """
     This function takes as input parameters the model initial state DataFrame,
     the new ohm coefficients as calculated by performing linear regression on
     AMF Obs and the land cover type for which they were calculated.
 
-    Input params: df_state_init: pandas df returned by supy after running SUEWS.
-                  coefs: tuple containing new a1, a2, a3 coefficients.
-                  land_cover_type: String specifying one of seven SUEWS land cover types.
-    Returns: df_state_init_copy: A copy of df_state_init with changed ohm params.
+    Parameters
+    ----------
+    df_state : pandas.DataFrame
+        Model state dataframe used in supy
+    coefs : tuple
+        new a1, a2, a3 coefficients to replace those in `df_state`;
+        note:
+        1. the format should be (a1, a3, a3);
+        2. any of a1/a2/a3 can be either one numeric value or a list-like structure of four values for SW/SD/WW/WD conditions indicated by `ohm_threshsw` and `ohm_threshwd`.
+    land_cover_type : str
+        one of seven SUEWS land cover types, can be any of
+        1. {"Paved","Bldgs","EveTr","DecTr","Grass","BSoil","Water"} (string case does NOT matter); or
+        2. an integer between 0 to 6.
+
+    Returns
+    -------
+    pandas.DataFrame
+        a DataFrame with updated OHM coefficients.
     """
 
     land_cover_type_dict = {
-        "Paved": "1",
-        "Bldgs": "2",
-        "EveTr": "3",
-        "DecTr": "4",
-        "Grass": "5",
-        "BSoil": "6",
-        "Water": "7",
+        "paved": 0,
+        "bldgs": 1,
+        "evetr": 2,
+        "dectr": 3,
+        "grass": 4,
+        "bsoil": 5,
+        "water": 6,
     }
 
     try:
-        lc_index = int(land_cover_type_dict.get(land_cover_type)) - 1
+        lc_index = (
+            land_cover_type_dict.get(land_cover_type.lower())
+            if isinstance(land_cover_type, str)
+            else land_cover_type
+        )
     except:
         list_lc = list(land_cover_type_dict.keys())
         logger_supy.error(
@@ -95,15 +130,15 @@ def replace_ohm_coeffs(df_state_init, coefs, land_cover_type):
         coef_matrix[:, 2] = coefs[2]
 
         # Copy ohm_coef part of df_state_init
-        df_ohm = df_state_init.loc[:, "ohm_coef"].copy()
+        df_ohm = df_state.loc[:, "ohm_coef"].copy()
         # Reshape values into matrix form
-        values_ohm = df_ohm.values.reshape((8, 4, 3))
+        values_ohm = df_ohm.values.reshape((-1, 8, 4, 3))
         # Get ohm values corresponding to user specified land cover and assign to matrix
-        values_ohm[lc_index] = coef_matrix
+        values_ohm[:, lc_index] = coef_matrix
         # Place new ohm values into df_ohm
-        df_ohm.loc[:, :] = values_ohm.flatten()
+        df_ohm.loc[:, :] = values_ohm.reshape(df_ohm.shape)
         # Make copy of df_state_init
-        df_state_init_copy = df_state_init.copy()
+        df_state_init_copy = df_state.copy()
         # Replace  ohm_coef part of df_state_init with new values
         df_state_init_copy.loc[:, "ohm_coef"] = df_ohm.values
 
@@ -147,11 +182,11 @@ def sim_ohm(ser_qn: pd.Series, a1: float, a2: float, a3: float) -> pd.Series:
 
 def compare_heat_storage(ser_qn_obs, ser_qs_obs, a1, a2, a3):
     """This function compares the storage heat flux calculated with AMF
-       QN and linear regression coefficients with  that output by SUEWS.
-       Input params: QN_Ser_Obs: A series of OBS net all-wave radiation.
-                     QS_Ser_SUEWS: A series of SUEWS storage heat flux values.
-                     a1, a2, a3: Linear regression coefficients from ohm_linregress_clean.
-       Returns: MPL plot of diurnal comparison, MPL plot with 1:1 line and fitted line.
+    QN and linear regression coefficients with  that output by SUEWS.
+    Input params: QN_Ser_Obs: A series of OBS net all-wave radiation.
+                  QS_Ser_SUEWS: A series of SUEWS storage heat flux values.
+                  a1, a2, a3: Linear regression coefficients from ohm_linregress_clean.
+    Returns: MPL plot of diurnal comparison, MPL plot with 1:1 line and fitted line.
     """
 
     # calculate qs using OHM

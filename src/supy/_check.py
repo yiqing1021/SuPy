@@ -198,6 +198,8 @@ def check_forcing(df_forcing: pd.DataFrame, fix=False):
             return df_forcing_fix
     else:
         logger_supy.info("All checks for `df_forcing` passed!")
+        if fix:
+            return df_forcing
 
 
 def check_state(df_state: pd.DataFrame) -> List:

@@ -23,17 +23,15 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 # utility functions
 def roundPartial(value, resolution):
+    """
+    Geopotential Functions on WGS84 Reference Ellipsoid
+
+    This module contains code for converting Geopotential to Geometric and vice-versa on the WGS84 reference ellipsoid
+
+    ERA-5 utility functions from Chris Roth # https://pypi.org/project/eratools/
+    """
     return round(value / resolution) * resolution
 
-
-"""Geopotential Functions on WGS84 Reference Ellipsoid
-
-This module contains code for converting Geopotential to Geometric and vice-versa on the WGS84 reference ellipsoid
-
-ERA-5 utility functions from Chris Roth
-# https://pypi.org/project/eratools/
-
-"""
 
 Rmax_WGS84 = 6378137
 Rmin_WGS84 = Rmax_WGS84 * (1 - 1 / 298.257223563)
@@ -99,7 +97,13 @@ def geopotential2geometric(h: float, latitude: float) -> float:
 
 
 # functions to interpolate the atmospheric variables to a specified height/altitude
-def get_ser_val_alt(lat: float, lon: float, da_alt_x, da_alt, da_val,) -> pd.Series:
+def get_ser_val_alt(
+    lat: float,
+    lon: float,
+    da_alt_x,
+    da_alt,
+    da_val,
+) -> pd.Series:
     """interpolate atmospheric variable to a specified altitude
 
     Parameters
@@ -128,7 +132,11 @@ def get_ser_val_alt(lat: float, lon: float, da_alt_x, da_alt, da_val,) -> pd.Ser
     val_alt = np.array(
         [interp1d(alt_1d, val_1d)(alt_x) for alt_1d, val_1d in zip(alt_t_1d, val_t_1d)]
     )
-    ser_alt = pd.Series(val_alt, index=da_val.time.values, name=da_val.name,)
+    ser_alt = pd.Series(
+        val_alt,
+        index=da_val.time.values,
+        name=da_val.name,
+    )
     return ser_alt
 
 
@@ -221,7 +229,11 @@ def gen_dict_proc(dict_x):
         "ml": "reanalysis-era5-pressure-levels",
     }
     feed_x = dict_feed[type_x]
-    dict_proc = dict(name=feed_x, request=dict_x, target=gen_fn(dict_x),)
+    dict_proc = dict(
+        name=feed_x,
+        request=dict_x,
+        target=gen_fn(dict_x),
+    )
 
     return dict_proc
 
@@ -677,7 +689,7 @@ def gen_forcing_era5(
         Reference
         ---------
             ECMWF, S. P. (2016). In IFS documentation CY41R2 Part IV: Physical Processes. ECMWF: Reading, UK, 111-113. https://www.ecmwf.int/en/elibrary/16648-part-iv-physical-processes
-        
+
         4. For `start`/`end`, it is recommended to use the format `YYYY-MM-DD` to avoid confusion in day/month-first convensions (`an upstream known issue <https://pandas.pydata.org/docs/reference/api/pandas.to_datetime.html#pandas.to_datetime>`_ due to the `dateutil` behavior)
     """
     import xarray as xr
