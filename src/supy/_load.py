@@ -1365,8 +1365,7 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 
     # update `waterstate` with df_gridSurfaceChar
     # drop_duplicates in case multi-year run is set
-    # df_InitialCond_grid['waterstate'] = df_gridSurfaceChar_init['waterdepth']
-    df_init[("waterstate", "0")] = df_init["waterdepth"]
+    df_init[("waterstate", "0")] = df_init["waterdepth"].values
 
     # generate proper Initial Condition file names
     base_str = "initialconditions" + dict_ModConfig["filecode"]
@@ -1534,9 +1533,9 @@ def add_state_init_df(df_init):
 
     # modifications for special cases
     # `lai_id` corrections:
-    df_init[("lai_id", "(0,)")] = df_init["laiinitialevetr"]
-    df_init[("lai_id", "(1,)")] = df_init["laiinitialdectr"]
-    df_init[("lai_id", "(2,)")] = df_init["laiinitialgrass"]
+    df_init[("lai_id", "(0,)")] = df_init["laiinitialevetr"].values
+    df_init[("lai_id", "(1,)")] = df_init["laiinitialdectr"].values
+    df_init[("lai_id", "(2,)")] = df_init["laiinitialgrass"].values
     # # `gdd_id` corrections:
     # df_init[('gdd_id', '(2,)')] = 90
     # df_init[('gdd_id', '(3,)')] = -90

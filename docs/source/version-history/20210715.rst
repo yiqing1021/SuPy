@@ -1,16 +1,18 @@
+.. _new_latest:
+.. _new_dev:
 
-Version 2021.7.15
+Version 2021.5.26
 ======================================================
 
 
 - **New**
 
-  None.
+  1. Update supy-driver to `2021a` iteration.
 
 
 - **Improvement**
 
-  None.
+  1. a new method for calculating roughness length for momentum and displacement height (`roughlenmommethod=4`) based on plan area index as illustrated in figure 1a of GO99.
 
 - **Changes**
 
@@ -19,7 +21,7 @@ Version 2021.7.15
 
 - **Fix**
 
-  Fixed an issue in loading parameter table caused by recent update of ``pandas`` to ``1.3.x``.
+  None.
 
 
 - **Known issue**
