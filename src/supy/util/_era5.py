@@ -210,7 +210,7 @@ def gen_fn(dict_x):
     # starting month
     mon_x = dict_x["month"][0]
     # type of dataset: `sfc` for surface level while `ml` for atmospheric multi-level
-    type_x = "sfc" if "orography" in dict_x["variable"] else "ml"
+    type_x = "sfc" if "2m_temperature" in dict_x["variable"] else "ml"
 
     # format location coordinates in filename
     lat_c = f"{lat_c}N" if lat_c > 0 else f"{-lat_c}S"
@@ -223,7 +223,7 @@ def gen_fn(dict_x):
 
 # dict_x: a dict describing download elements
 def gen_dict_proc(dict_x):
-    type_x = "sfc" if "orography" in dict_x["variable"] else "ml"
+    type_x = "sfc" if "2m_temperature" in dict_x["variable"] else "ml"
     dict_feed = {
         "sfc": "reanalysis-era5-single-levels",
         "ml": "reanalysis-era5-pressure-levels",
@@ -281,7 +281,7 @@ def gen_req_sfc(lat_x, lon_x, start, end, grid=None, scale=0):
         "10m_v_component_of_wind": "instantaneous",
         "2m_dewpoint_temperature": "instantaneous",
         "2m_temperature": "instantaneous",
-        "orography": "instantaneous",
+        "geopotential": "instantaneous",
         "surface_pressure": "instantaneous",
         "surface_solar_radiation_downwards": "accumulation",
         "surface_thermal_radiation_downwards": "accumulation",
