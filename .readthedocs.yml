@@ -20,7 +20,7 @@ python:
 
 formats:
   - epub
-  - pdf
+  # - pdf
 
 sphinx:
   builder: html
