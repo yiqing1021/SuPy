@@ -78,5 +78,5 @@ SuPy: SUEWS that speaks Python
   data-structure/supy-io
   api
   faq
-  version-history/version-history
+  version-history
 
