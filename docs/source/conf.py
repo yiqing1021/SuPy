@@ -46,9 +46,9 @@ copyright = ", ".join([year, author])
 
 
 # The short X.Y version
-version = supy.__version__
+version = supy.__version__.strip()
 # The full version, including alpha/beta/rc tags
-release = supy.__version__
+release = supy.__version__.strip()
 
 
 # -- General configuration ---------------------------------------------------
@@ -215,7 +215,7 @@ rst_prolog = """
 # html_theme_options = {}
 # This is processed by Jinja2 and inserted before each notebook
 nbsphinx_prolog = r"""
-{% set docname = 'source/' + env.doc2path(env.docname, base=None) %}
+{% set docname = 'docs/source/' + env.doc2path(env.docname, base=False) %}
 
 .. raw:: html
 
@@ -247,7 +247,7 @@ nbsphinx_prolog = r"""
 
 # This is processed by Jinja2 and inserted after each notebook
 nbsphinx_epilog = r"""
-{% set docname = 'source/' + env.doc2path(env.docname, base=None) %}
+{% set docname = 'docs/source/' + env.doc2path(env.docname, base=None) %}
 .. raw:: latex
 
     \nbsphinxstopnotebook{\scriptsize\noindent\strut
