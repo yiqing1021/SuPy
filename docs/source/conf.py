@@ -50,6 +50,13 @@ version = supy.__version__.strip()
 # The full version, including alpha/beta/rc tags
 release = supy.__version__.strip()
 
+# There are two options for replacing |today|: either, you set today to some
+# non-false value, then it is used:
+# today = ''
+# Else, today_fmt is used as the format for a strftime call.
+today_fmt = "%Y-%m-%d"
+
+html_last_updated_fmt = today_fmt
 
 # -- General configuration ---------------------------------------------------
 
@@ -81,6 +88,7 @@ extensions = [
     "sphinx_comments",
     "IPython.sphinxext.ipython_directive",
     "IPython.sphinxext.ipython_console_highlighting",
+    "sphinx_last_updated_by_git",
     "sphinx_click.ext",
     # 'sphinx_gallery.gen_gallery',
 ]
