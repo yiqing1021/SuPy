@@ -5,6 +5,37 @@ Version History
 
 .. _new_latest:
 
+Version 2021.11.20
+------------------------------
+
+
+- **New**
+
+  1. Added option ``pressure_level`` in `gen_forcing_era5`.
+
+
+- **Improvement**
+
+  None.
+
+- **Changes**
+
+  None.
+
+
+- **Fix**
+
+  1. Fixed an issue in generating ERA5 forcing due to xarray update in ``merge``.
+
+
+- **Known issue**
+
+  1. ESTM is not supported yet.
+  2. BLUEWS, a CBL modules in SUEWS, is not supported yet.
+  3. Simulation in parallel mode is NOT supported on Windows
+     due to system limitation.
+
+
 
 Version 2021.7.22
 ------------------------------

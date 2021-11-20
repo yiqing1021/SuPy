@@ -93,7 +93,7 @@ Roughness Calculation
 .. autosummary::
     :toctree: api/supy.util
 
-    optimize_MO
+    cal_z0zd
     cal_neutral
 
 

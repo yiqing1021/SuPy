@@ -640,6 +640,7 @@ def gen_forcing_era5(
     scale=0,
     force_download=True,
     simple_mode=True,
+    pressure_level=None,
     logging_level=logging.INFO,
 ) -> list:
     """Generate SUEWS forcing files using ERA-5 data.
@@ -670,6 +671,10 @@ def gen_forcing_era5(
         if use the *simple* mode for diagnosing the forcing variables, by default `True`.
         In the simple mode, temperature is diagnosed using environmental lapse rate 6.5 K/km and wind speed using MOST under neutral condition.
         If `False`, MOST with consideration of stability conditions will be used to diagnose forcing variables.
+    pressure_level: float
+        pressure level to retrieve ERA5 atmospheric data, by default None.
+        If `None`, this option is ignored.
+        If not `None`, calculations implied by `simple_mode` will be skipped: the data at specified pressure level will be used as forcing data and the mean altitude of the pressure level between specified `start` and `end` will be assumed to be the forcing height (i.e., `hgt_agl_diag` will be ignored if set).
     logging_level: logging level
         one of these values [50 (CRITICAL), 40 (ERROR), 30 (WARNING), 20 (INFO), 10 (DEBUG)].
         A lower value informs SuPy for more verbose logging info.
@@ -707,13 +712,19 @@ def gen_forcing_era5(
 
     # load data from from `sfc` files
     ds_sfc = xr.open_mfdataset(
-        list_fn_sfc, concat_dim="time", combine="by_coords"
+        list_fn_sfc,
+        concat_dim="time",
+        combine="nested",
     ).load()
     # close dangling handlers
     ds_sfc.close()
 
-    # generate diagnostics at a higher level
-    ds_diag = gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag, simple_mode)
+    if pressure_level is None:
+        # generate diagnostics at a higher level
+        ds_diag = gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag, simple_mode)
+    else:
+        # directly retrieve data at specified pressure level
+        ds_diag = get_era5_pressure_level(list_fn_ml, pressure_level)
 
     # merge diagnostics above with surface variables
     ds_forcing_era5 = ds_sfc.merge(ds_diag)
@@ -827,13 +838,19 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
 
     # load data from from `sfc` files
     ds_sfc = xr.open_mfdataset(
-        list_fn_sfc, concat_dim="time", combine="by_coords"
+        list_fn_sfc,
+        concat_dim="time",
+        combine="nested",
     ).load()
     # close dangling handlers
     ds_sfc.close()
 
     # load data from from `ml` files
-    ds_ml = xr.open_mfdataset(list_fn_ml, concat_dim="time", combine="by_coords").load()
+    ds_ml = xr.open_mfdataset(
+        list_fn_ml,
+        concat_dim="time",
+        combine="nested",
+    ).load()
     # close dangling handlers
     ds_ml.close()
 
@@ -906,10 +923,31 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
 
     # get dataset of diagnostics
     if simple_mode:
-        ds_diag = diag_era5_simple(z0m, ustar, pres_z0, uv10, t2, q2, z)
+        ds_diag = diag_era5_simple(
+            z0m,
+            ustar,
+            pres_z0,
+            uv10,
+            t2,
+            q2,
+            z,
+        )
     else:
         ds_diag = diag_era5(
-            za, uv_za, t_za, q_za, pres_za, qh, qe, z0m, ustar, pres_z0, uv10, t2, q2, z
+            za,
+            uv_za,
+            t_za,
+            q_za,
+            pres_za,
+            qh,
+            qe,
+            z0m,
+            ustar,
+            pres_z0,
+            uv10,
+            t2,
+            q2,
+            z,
         )
 
     # merge altitude
@@ -994,6 +1032,7 @@ def diag_era5(
     tstar = -qh / (avcp * avdens) / ustar
     # qstar = -qe / (lv_j_kg * avdens) / ustar
 
+    # Obukhov length
     l_mod = ustar ** 2 / (g / t2 * kappa * tstar)
     zoL = np.where(
         np.abs((z + z0m) / l_mod) < 5,
@@ -1001,7 +1040,6 @@ def diag_era5(
         np.sign((z + z0m) / l_mod) * 5,
     )
 
-    # `stab_psi_mom`, `stab_psi_heat`
     # stability correction for momentum
     psim_z = cal_psi_mom(zoL)
     psim_z0 = cal_psi_mom(z0m / l_mod)
@@ -1066,6 +1104,68 @@ def diag_era5(
             p_z.rename("p_z"),
         ]
     )
+    return ds_diag
+
+
+# diagnose ISL variable using MOST
+def get_era5_pressure_level(list_fn_ml, pressure_level):
+
+    from atmosp import calculate as ac
+    import xarray as xr
+    from ._atm import cal_lat_vap, cal_cp, cal_psi_mom, cal_psi_heat
+
+    # load data from from `ml` files
+    ds_ml = xr.open_mfdataset(
+        list_fn_ml,
+        concat_dim="time",
+        combine="nested",
+    ).load()
+    # close dangling handlers
+    ds_ml.close()
+
+    # retrieve data at specified pressure level
+    try:
+        ds_ml_p = ds_ml.sel(level=pressure_level)
+    except KeyError:
+        raise ValueError(
+            f"Pressure level {pressure_level} not found in the dataset. "
+            f"Available levels: {ds_ml.level.values}"
+        )
+
+    # altitude: use mean value of chosen period
+    alt_za = geopotential2geometric(ds_ml_p.z, ds_ml_p.latitude)
+    da_alt_z = alt_za.mean() + alt_za * 0
+    ds_alt_z = da_alt_z.rename("alt_z").to_dataset()
+
+    # wind speed
+    uv_z = (ds_ml_p.u ** 2 + ds_ml_p.v ** 2) ** 0.5
+
+    # air temperature
+    t_z = ds_ml_p.t
+
+    # atmospheric pressure
+    p_z = pressure_level + t_z * 0
+
+    # specific humidity
+    q_z = ds_ml_p.q
+
+    # relative humidity; cap at 105% if above
+    RH_z = ac("RH", qv=q_z, p=p_z, T=t_z) + 0 * q_z
+    RH_z = RH_z.where(RH_z < 105, 105)
+
+    # generate dataset
+    ds_diag = xr.merge(
+        [
+            uv_z.rename("uv_z"),
+            t_z.rename("t_z"),
+            q_z.rename("q_z"),
+            RH_z.rename("RH_z"),
+            p_z.rename("p_z"),
+        ]
+    )
+
+    # merge altitude
+    ds_diag = ds_diag.merge(ds_alt_z).drop_vars("level")
     return ds_diag
 
 

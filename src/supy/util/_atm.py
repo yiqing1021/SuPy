@@ -112,7 +112,7 @@ def cal_cp(qa_kgkg, ta_K, pres_hPa):
 
 # calculate specific heat capacity of air [J kg-1 K-1]
 def cal_cp_with_rh(temp_C, rh_pct, pres_hPa):
-    from atmosp import calculate as ac
+    # from atmosp import calculate as ac
 
     # Garratt equation a20(1992)
     cpd = 1005.0 + ((temp_C + 23.16) ** 2) / 3364.0
@@ -183,10 +183,15 @@ def cal_psi_heat(zoL):
 
 # saturation vapour pressure [hPa]
 def cal_vap_sat(Temp_C, Press_hPa):
-    ser_pres_kPa = pd.Series(Press_hPa / 10)
-    ser_TaC = pd.Series(Temp_C)
+    try:
+        ser_pres_kPa = pd.Series(Press_hPa / 10)
+        ser_TaC = pd.Series(Temp_C)
+    except:
+        ser_pres_kPa = Press_hPa
+        ser_TaC = Temp_C
+
     # if ser_TaC is close to zero degC, set to 0.001 degC
-    ser_TaC = ser_TaC.where(ser_TaC.abs() > 0.001, 0.001)
+    ser_TaC = ser_TaC.where(np.abs(ser_TaC) > 0.001, 0.001)
 
     # ser_es_hPa = cal_vap_sat(0.001, Press_hPa)
 
@@ -262,15 +267,15 @@ def cal_dens_air(Press_hPa, Temp_C):
 
 
 # Obukhov length
-def cal_Lob(QH, UStar, Temp_C, RH_pct, Press_hPa, g=9.8, k=0.4):
+def cal_Lob(QH, UStar, Temp_C, RH_pct, Pres_hPa, g=9.8, k=0.4):
     # gravity constant/(Temperature*Von Karman Constant)
     G_T_K = (g / (Temp_C + 273.16)) * k
 
     # air density [kg m-3]
-    rho = cal_dens_air(Press_hPa, Temp_C)
+    rho = cal_dens_air(Pres_hPa, Temp_C)
 
     # specific heat capacity of air mass [J kg-1 K-1]
-    cpa = cal_cp_with_rh(Temp_C, RH_pct, Press_hPa)
+    cpa = cal_cp_with_rh(Temp_C, RH_pct, Pres_hPa)
 
     # Kinematic sensible heat flux [K m s-1]
     H = QH / (rho * cpa)
