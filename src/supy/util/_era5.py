@@ -1143,8 +1143,8 @@ def get_era5_pressure_level(list_fn_ml, pressure_level):
     # air temperature
     t_z = ds_ml_p.t
 
-    # atmospheric pressure
-    p_z = pressure_level + t_z * 0
+    # atmospheric pressure (hPa to Pa)
+    p_z = pressure_level*100 + t_z * 0
 
     # specific humidity
     q_z = ds_ml_p.q
