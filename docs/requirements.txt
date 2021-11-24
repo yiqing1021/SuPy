@@ -30,3 +30,4 @@ sphinx-book-theme
 sphinx-panels
 sphinxcontrib.email
 sphinx-last-updated-by-git
+chardet
