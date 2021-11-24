@@ -79,8 +79,6 @@ setup(
         ]
     },
     include_package_data=True,
-    test_suite="nose.collector",
-    tests_require=["nose"],
     python_requires="~=3.7",
     classifiers=[
         "Programming Language :: Python :: 3 :: Only",
