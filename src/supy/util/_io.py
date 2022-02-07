@@ -24,7 +24,10 @@ def read_suews(path_suews_file: str) -> pd.DataFrame:
 
     path_suews_file = Path(path_suews_file).resolve()
     df_raw = pd.read_csv(
-        path_suews_file, delim_whitespace=True, comment="!", error_bad_lines=True
+        path_suews_file,
+        delim_whitespace=True,
+        comment="!",
+        on_bad_lines='error',
     )
     df_suews = set_index_dt(df_raw)
     return df_suews
@@ -59,14 +62,12 @@ def read_forcing(path_suews_file: str, tstep_mod=300) -> pd.DataFrame:
     df_forcing = df_forcing_raw
 
     # resampling only when necessary
-    if (tstep_mod is not None):
-        if (tstep_mod < tstep_met_in):
+    if tstep_mod is not None:
+        if tstep_mod < tstep_met_in:
             df_forcing = df_forcing_raw.replace(-999, np.nan)
             df_forcing = resample_forcing_met(
                 df_forcing, tstep_met_in, tstep_mod, kdownzen=0
             )
             df_forcing = df_forcing.replace(np.nan, -999)
-
-
 
     return df_forcing
