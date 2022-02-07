@@ -697,18 +697,7 @@ def load_SUEWS_Forcing_met_df_pattern(path_input, file_pattern):
         [f for f in path_input.glob(file_pattern) if "ESTM" not in f.name]
     )
 
-    # load raw data
-    # # read in forcing with dask.dataframe in parallel
-    # dd_forcing_met = dd.read_csv(
-    #     list_file_MetForcing,
-    #     delim_whitespace=True,
-    #     comment="!",
-    #     error_bad_lines=True,
-    #     assume_missing=True,
-    # )
-    # # convert to normal pandas dataframe
-    # df_forcing_met = dd_forcing_met.compute()
-
+    # load met data
     df_forcing_met = pd.concat([read_suews(fn) for fn in list_file_MetForcing])
     # `drop_duplicates` in case some duplicates mixed
     df_forcing_met = df_forcing_met.drop_duplicates()
