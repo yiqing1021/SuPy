@@ -408,7 +408,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "pandas": ("http://pandas.pydata.org/pandas-docs/stable/", None),
     "numpy": ("https://docs.scipy.org/doc/numpy/", None),
-    "suews": ("https://suews.readthedocs.io/en/develop/", None),
+    "suews": ("https://suews.readthedocs.io/en/latest/", None),
     "lmfit": ("https://lmfit.github.io/lmfit-py/", None),
 }
 

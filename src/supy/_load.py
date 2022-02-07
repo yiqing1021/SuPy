@@ -245,19 +245,25 @@ def load_SUEWS_table(path_file):
         logger_supy.exception(f"{path_file} does not exists!")
     else:
         # fileX = path_insensitive(fileX)
-        str_file = str(path_file)
-        rawdata = pd.read_csv(
-            str_file,
-            delim_whitespace=True,
-            comment="!",
-            error_bad_lines=False,
-            skiprows=1,
-            index_col=0,
-        )
-        rawdata = rawdata.dropna()
-        # rawdata = rawdata.apply(pd.to_numeric)
-        rawdata.index = rawdata.index.astype(int)
-    return rawdata
+        # str_file = str(path_file)
+        try:
+            rawdata = pd.read_csv(
+                path_file,
+                delim_whitespace=True,
+                comment="!",
+                on_bad_lines='error',
+                encoding_errors='ignore',
+                skiprows=1,
+                index_col=0,
+            )
+            rawdata = rawdata.dropna()
+            # rawdata = rawdata.apply(pd.to_numeric)
+            rawdata.index = rawdata.index.astype(int)
+            return rawdata
+        except Exception as err:
+            logger_supy.exception(f"error {err} in reading {path_file}!")
+
+
 
 
 # load all tables into variables staring with 'lib_' and filename
@@ -1357,8 +1363,7 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
     # initialise df_InitialCond_grid with default values
     logger_supy.debug("adding initial condition namelists")
     for k in dict_InitCond_default:
-        # df_InitialCond_grid[k] = dict_InitCond_default[k]
-        df_init[(k, "0")] = dict_InitCond_default[k]
+        df_init.loc[:,(k, "0")] = dict_InitCond_default[k]
 
     # update `temp_c0` with met_forcing
     # # TODO: add temp_c0 from met_forcing
@@ -1388,7 +1393,7 @@ def modify_df_init(df_init, list_var_dim):
         ind_dim = [str(i) for i in np.ndindex(int(dim))] if dim > 0 else ["0"]
         val_x = df_init[val] if isinstance(val, str) else val
         for ind in ind_dim:
-            df_init[(var, str(ind))] = val_x
+            df_init.loc[:,(var, str(ind))] = val_x
 
     return df_init
 
