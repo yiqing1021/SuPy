@@ -22,8 +22,13 @@ import supy
 sys.path.insert(0, os.path.abspath("."))
 
 print(r"this build is made by:", "\n", sys.version)
-print(r"this build is for:", "\n")
-supy.show_version()
+# determine if in RTD environment
+read_the_docs_build = os.environ.get("READTHEDOCS", None) == "True"
+if read_the_docs_build:
+    pass
+else:
+    print(r"this build is for:", "\n")
+    supy.show_version()
 
 
 def subprocess_cmd(command):
