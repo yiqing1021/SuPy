@@ -49,7 +49,7 @@ setup(
     # distclass=BinaryDistribution,
     ext_modules=[],
     install_requires=[
-        "pandas>=1.1",
+        "pandas>=1.3",
         "matplotlib",
         "scipy",
         "dask",  # needs dask for parallel tasks

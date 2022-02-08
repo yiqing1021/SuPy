@@ -245,19 +245,23 @@ def load_SUEWS_table(path_file):
         logger_supy.exception(f"{path_file} does not exists!")
     else:
         # fileX = path_insensitive(fileX)
-        str_file = str(path_file)
-        rawdata = pd.read_csv(
-            str_file,
-            delim_whitespace=True,
-            comment="!",
-            error_bad_lines=False,
-            skiprows=1,
-            index_col=0,
-        )
-        rawdata = rawdata.dropna()
-        # rawdata = rawdata.apply(pd.to_numeric)
-        rawdata.index = rawdata.index.astype(int)
-    return rawdata
+        # str_file = str(path_file)
+        try:
+            rawdata = pd.read_csv(
+                path_file,
+                delim_whitespace=True,
+                comment="!",
+                on_bad_lines="error",
+                encoding_errors="ignore",
+                skiprows=1,
+                index_col=0,
+            )
+            rawdata = rawdata.dropna()
+            # rawdata = rawdata.apply(pd.to_numeric)
+            rawdata.index = rawdata.index.astype(int)
+            return rawdata
+        except Exception as err:
+            logger_supy.exception(f"error {err} in reading {path_file}!")
 
 
 # load all tables into variables staring with 'lib_' and filename
@@ -535,7 +539,6 @@ def resample_linear_avg(data_raw_avg, tstep_in, tstep_mod):
     data_raw_tstep = data_raw_tstep.asfreq(f"{tstep_mod}S")
     data_tstep = data_raw_tstep.interpolate("linear")
 
-
     # fill gaps with valid values
     data_tstep = data_tstep.copy().bfill().ffill().dropna(how="all")
 
@@ -691,18 +694,7 @@ def load_SUEWS_Forcing_met_df_pattern(path_input, file_pattern):
         [f for f in path_input.glob(file_pattern) if "ESTM" not in f.name]
     )
 
-    # load raw data
-    # # read in forcing with dask.dataframe in parallel
-    # dd_forcing_met = dd.read_csv(
-    #     list_file_MetForcing,
-    #     delim_whitespace=True,
-    #     comment="!",
-    #     error_bad_lines=True,
-    #     assume_missing=True,
-    # )
-    # # convert to normal pandas dataframe
-    # df_forcing_met = dd_forcing_met.compute()
-
+    # load met data
     df_forcing_met = pd.concat([read_suews(fn) for fn in list_file_MetForcing])
     # `drop_duplicates` in case some duplicates mixed
     df_forcing_met = df_forcing_met.drop_duplicates()
@@ -1237,7 +1229,9 @@ dict_RunControl_default = {
 # load RunControl variables
 def load_SUEWS_dict_ModConfig(path_runcontrol, dict_default=dict_RunControl_default):
     dict_RunControl = dict_default.copy()
-    dict_RunControl_x = load_SUEWS_nml(path_runcontrol).loc[:, "runcontrol"].to_dict()
+    df_RunControl = load_SUEWS_nml(path_runcontrol)
+    df_RunControl = df_RunControl.loc[:, "runcontrol"]
+    dict_RunControl_x = df_RunControl.to_dict()
     dict_RunControl.update(dict_RunControl_x)
     return dict_RunControl
 
@@ -1356,9 +1350,19 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 
     # initialise df_InitialCond_grid with default values
     logger_supy.debug("adding initial condition namelists")
-    for k in dict_InitCond_default:
-        # df_InitialCond_grid[k] = dict_InitCond_default[k]
-        df_init[(k, "0")] = dict_InitCond_default[k]
+    dict_mod = {k: v for k, v in dict_InitCond_default.items()}
+    df_init = df_init.assign(**dict_mod)
+    # print(df_init.iloc[:,-10:].head())
+    # rename columns to conform to multi-index convention
+    dict_key_mod = {(k, ""): (k, "0") for k in dict_InitCond_default.keys()}
+    df_init.columns = df_init.columns.to_flat_index()
+    df_init = df_init.rename(columns=dict_key_mod)
+    df_init.columns = pd.MultiIndex.from_tuples(
+        df_init.columns.to_flat_index(),
+        names=["var", "ind_dim"],
+    )
+    # for k in dict_InitCond_default:
+    #     df_init.loc[:, (k, "0")] = dict_InitCond_default[k]
 
     # update `temp_c0` with met_forcing
     # # TODO: add temp_c0 from met_forcing
@@ -1384,13 +1388,24 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 
 
 def modify_df_init(df_init, list_var_dim):
+    df_init_mod = df_init.copy()
+    len_df = len(df_init_mod)
+    # note the two-step process to avoid creating fragmented dataframes
+    # 1. set up a new dataframe with added columns
+    dict_col_new = {}
     for var, dim, val in list_var_dim:
+        # print(var, dim, val)
         ind_dim = [str(i) for i in np.ndindex(int(dim))] if dim > 0 else ["0"]
-        val_x = df_init[val] if isinstance(val, str) else val
+        val_x = df_init_mod[val].values if isinstance(val, str) else val
         for ind in ind_dim:
-            df_init[(var, str(ind))] = val_x
+            dict_col_new[(var, ind)] = np.repeat(val_x, len_df)
+    df_col_new= pd.DataFrame(dict_col_new,index=df_init_mod.index)
 
-    return df_init
+    # 2. merge new columns into original dataframe
+    df_init_mod = df_init_mod.merge(df_col_new, left_index=True, right_index=True)
+
+
+    return df_init_mod
 
 
 # load Initial Condition variables from namelist file
@@ -1614,7 +1629,7 @@ def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     df_init = trim_df_state(df_init)
 
     # normalise surface fractions to prevent non-1 sums
-    df_sfr = df_init.sfr
+    df_sfr = df_init.sfr.copy()
     df_sfr = df_sfr.div(df_sfr.sum(axis=1), axis=0)
     df_init.sfr = df_sfr
 

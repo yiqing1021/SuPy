@@ -97,7 +97,11 @@ def suews_cal_tstep_multi(dict_state_start_grid, df_met_forcing_block):
         {
             "metforcingblock": np.array(
                 df_met_forcing_block.drop(
-                    columns=["metforcingdata_grid", "ts5mindata_ir", "isec",]
+                    columns=[
+                        "metforcingdata_grid",
+                        "ts5mindata_ir",
+                        "isec",
+                    ]
                 ),
                 order="F",
             ),
@@ -390,11 +394,7 @@ def run_supy_ser(
             df_state_final = pack_df_state(dict_state).swaplevel(0, 1)
 
     # drop ESTM for now as it is not supported yet
-    # select only those supported output groups
-    list_group_use = [
-        group for group in df_output.columns.levels[0] if group not in ["ESTM"]
-    ]
-    df_output = df_output.loc[:, list_group_use]
+    df_output = df_output.drop("ESTM", axis=1, level="group")
     # trim multi-index based columns
     df_output.columns = df_output.columns.remove_unused_levels()
 
