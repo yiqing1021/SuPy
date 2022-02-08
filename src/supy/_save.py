@@ -211,13 +211,13 @@ def save_df_output(
 
     # drop snow related group from output groups
     if not save_snow:
-        df_save = df_save.drop("snow", axis=1)
+        df_save = df_save.drop("snow", axis=1,level='group')
 
     # resample `df_output` at `freq_save`
     df_rsmp = resample_output(df_save, freq_save)
 
     # 'DailyState' group will be dropped in `resample_output` as resampling is not needed
-    df_rsmp = df_rsmp.drop(columns="DailyState")
+    df_rsmp = df_rsmp.drop(columns="DailyState", level="group")
 
     # dataframes to save
     list_df_save = (
