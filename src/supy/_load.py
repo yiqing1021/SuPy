@@ -1389,21 +1389,21 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 
 def modify_df_init(df_init, list_var_dim):
     df_init_mod = df_init.copy()
-    len_df = len(df_init_mod)
+    len_df = df_init_mod.index.size
     # note the two-step process to avoid creating fragmented dataframes
     # 1. set up a new dataframe with added columns
     dict_col_new = {}
     for var, dim, val in list_var_dim:
-        # print(var, dim, val)
         ind_dim = [str(i) for i in np.ndindex(int(dim))] if dim > 0 else ["0"]
-        val_x = df_init_mod[val].values if isinstance(val, str) else val
         for ind in ind_dim:
-            dict_col_new[(var, ind)] = np.repeat(val_x, len_df)
-    df_col_new= pd.DataFrame(dict_col_new,index=df_init_mod.index)
+            if isinstance(val, str):
+                dict_col_new[(var, ind)] = df_init_mod[val].values.reshape(len_df)
+            else:
+                dict_col_new[(var, ind)] = np.repeat(val, len_df)
+    df_col_new = pd.DataFrame(dict_col_new, index=df_init_mod.index)
 
     # 2. merge new columns into original dataframe
     df_init_mod = df_init_mod.merge(df_col_new, left_index=True, right_index=True)
-
 
     return df_init_mod
 
