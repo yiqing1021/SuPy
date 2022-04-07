@@ -877,6 +877,18 @@
         },
         "unit": "1"
     },
+    "diagmethod": {
+        "cat": "grid",
+        "logic": "method",
+        "param": {
+            "allowed": [
+                0,
+                1,
+                2
+            ]
+        },
+        "unit": "1"
+    },
     "ohm_coef": {
         "cat": "grid",
         "logic": "NA",
