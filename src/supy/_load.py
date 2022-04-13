@@ -222,7 +222,7 @@ df_var_info = df_info_suews_cal_multitsteps.merge(
 # load configurations: mod_config
 # process RunControl.nml
 # this function can handle all SUEWS nml files
-def load_SUEWS_nml(path_file):
+def load_SUEWS_nml_simple(path_file):
     # remove case issues
     # xfile = path_insensitive(xfile)
     try:
@@ -233,6 +233,24 @@ def load_SUEWS_nml(path_file):
         return df_res
     except FileNotFoundError:
         logger_supy.exception(f"{path_file} does not exists!")
+
+
+def load_SUEWS_nml(p_nml):
+    # remove case issues
+    # xfile = path_insensitive(xfile)
+    try:
+        p_nml = Path(path_insensitive(str(p_nml))).resolve()
+        df_nml = pd.DataFrame(f90nml.read(p_nml))
+        dict_nml_raw = {
+            name: np.array(row.dropna().values[0]) for name, row in df_nml.iterrows()
+        }
+        dict_nml = {}
+        for k, v in dict_nml_raw.items():
+            # print(k, v)
+            dict_nml.update(expand_entry(k, v))
+        return dict_nml
+    except FileNotFoundError:
+        logger_supy.exception(f"{p_nml} does not exists!")
 
 
 # load all tables (xgrid.e., txt files)
@@ -1229,9 +1247,9 @@ dict_RunControl_default = {
 # load RunControl variables
 def load_SUEWS_dict_ModConfig(path_runcontrol, dict_default=dict_RunControl_default):
     dict_RunControl = dict_default.copy()
-    df_RunControl = load_SUEWS_nml(path_runcontrol)
-    df_RunControl = df_RunControl.loc[:, "runcontrol"]
-    dict_RunControl_x = df_RunControl.to_dict()
+    df_RunControl = load_SUEWS_nml_simple(path_runcontrol)
+    ser_RunControl = df_RunControl.loc[:, "runcontrol"]
+    dict_RunControl_x = ser_RunControl.to_dict()
     dict_RunControl.update(dict_RunControl_x)
     return dict_RunControl
 
@@ -1320,6 +1338,7 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
     logger_supy.debug("loading df_gridSurfaceChar")
     df_gridSurfaceChar = load_SUEWS_SurfaceChar_df(path_input)
     # df_gridSurfaceChar.to_pickle("df_gridSurfaceChar.pkl")
+    logger_supy.debug("df_gridSurfaceChar.pkl saved!")
     # only use the first year of each grid as base for initial conditions
     logger_supy.debug("grouping grids")
     grp_df = df_gridSurfaceChar.sort_values(("year", "0")).groupby("Grid")
@@ -1384,7 +1403,31 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
         lambda fn: path_input / fn
     )
 
+    # generate proper grid layout file names
+    base_str = "GridLayout" + dict_ModConfig["filecode"]
+    grid_str = (
+        df_init.index.astype(str) if dict_ModConfig["multipleinitfiles"] == 1 else ""
+    )
+    year_str = df_init[("year", "0")].astype(int).astype(str)
+    # ser_path_init =base_str + grid_str + '_' + year_str + '.nml'
+    df_init[("file_gridlayout", "0")] = base_str + grid_str + ".nml"
+    # ser_path_init = ser_path_init.map(lambda fn: path_input / fn)
+    df_init[("file_gridlayout", "0")] = df_init[("file_gridlayout", "0")].map(
+        lambda fn: path_input / fn
+    )
+
     return df_init
+
+
+# expand multi-dimensional entries in dict
+def expand_entry(k, v):
+    ar = np.array(v)
+    ind_dim = ar.shape
+    dict_exp = {
+        (k, "0" if index == () else str(index)): ar[index]
+        for index in np.ndindex(ind_dim)
+    }
+    return dict_exp
 
 
 def modify_df_init(df_init, list_var_dim):
@@ -1411,11 +1454,11 @@ def modify_df_init(df_init, list_var_dim):
 # load Initial Condition variables from namelist file
 def add_file_init_df(df_init):
     # load all nml info from file names:('file_init', '0')
-    df_init_file = pd.concat(
-        df_init[("file_init", "0")].map(lambda fn: load_SUEWS_nml(fn)).to_dict()
-    ).unstack()["initialconditions"]
-    df_init_file = pd.concat([df_init_file], axis=1, keys=["0"])
-    df_init_file = df_init_file.swaplevel(0, 1, axis=1)
+    df_init_file = (
+        df_init[("file_init", "0")].map(lambda fn: load_SUEWS_nml(fn)).apply(pd.Series)
+    )
+    # df_init_file = pd.concat([df_init_file], axis=1, keys=["0"])
+    # df_init_file = df_init_file.swaplevel(0, 1, axis=1)
     df_init_file.index.set_names(["Grid"], inplace=True)
 
     # merge only those appeard in base df
@@ -1426,13 +1469,41 @@ def add_file_init_df(df_init):
     return df_init
 
 
+# load nml with multi-dimensional data
+def load_nml_multi(fn_nml):
+    df_nml = load_SUEWS_nml_simple(fn_nml)
+    dict_grid_layout = {
+        (name, "0"): r.dropna().values.tolist() for name, r in df_nml.iterrows()
+    }
+    df_grid_layout = pd.DataFrame(dict_grid_layout)
+    return df_grid_layout
+
+
+# load grid layout from namelist file
+def add_file_gridlayout_df(df_init):
+    # load all nml info from file names:('file_init', '0')
+    df_grid_layout = (
+        df_init[("file_gridlayout", "0")]
+        .map(lambda fn: load_SUEWS_nml(fn))
+        .apply(pd.Series)
+    )
+    df_grid_layout.index.set_names(["grid"], inplace=True)
+
+    # merge only those appeard in base df
+    df_init = pd.concat([df_init, df_grid_layout], axis=1)
+
+    # drop ('file_init', '0') as this may cause non-numeic errors later on
+    df_init = df_init.drop(columns=[("file_gridlayout", "0")])
+    return df_init
+
+
 # add veg info into `df_init`
 def add_veg_init_df(df_init):
     # get veg surface fractions
-    df_init[("fr_veg_sum", "0")] = df_init["sfr"].iloc[:, 2:5].sum(axis=1)
+    df_init[("fr_veg_sum", "0")] = df_init["sfr_surf"].iloc[:, 2:5].sum(axis=1)
 
     # get gdd_0 and sdd_0
-    veg_sfr = df_init["sfr"].iloc[:, 2:5].T
+    veg_sfr = df_init["sfr_surf"].iloc[:, 2:5].T
     veg_sfr = veg_sfr.reset_index(drop=True).T
     # gdd_0:
     x_gddfull = df_init["gddfull"].T.reset_index(drop=True).T
@@ -1484,7 +1555,7 @@ def add_veg_init_df(df_init):
 # add surface specific info into `df_init`
 def add_sfc_init_df(df_init):
     # create snow flag
-    ser_snow_init = df_init["snowinitially"]
+    ser_snow_init = df_init[("snowinitially", "0")]
     ser_snow_flag = ser_snow_init.where(ser_snow_init == 0, 1)
     ser_snow_flag = (df_init["snowuse"] * ser_snow_flag)["0"]
 
@@ -1607,6 +1678,8 @@ def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     # add Initial Condition variables from namelist file
     logger_supy.debug("adding initial conditions...")
     df_init = add_file_init_df(df_init)
+    # df_init.to_pickle("df_init.pkl")
+    # print("df_init saved!")
 
     # add surface specific info into `df_init`
     logger_supy.debug("adding surface specific conditions...")
@@ -1620,8 +1693,12 @@ def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     logger_supy.debug("adding dailystate specific conditions...")
     df_init = add_state_init_df(df_init)
 
+    # add Initial Condition variables from namelist file
+    logger_supy.debug("adding grid layout info...")
+    df_init = add_file_gridlayout_df(df_init)
+
     # # sort column names for consistency
-    logger_supy.debug("cleaning columns...")
+    logger_supy.debug("setting grid level...")
     df_init.index.set_names("grid", inplace=True)
 
     # filter out unnecessary entries by re-arranging the columns
@@ -1629,9 +1706,9 @@ def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     df_init = trim_df_state(df_init)
 
     # normalise surface fractions to prevent non-1 sums
-    df_sfr = df_init.sfr.copy()
-    df_sfr = df_sfr.div(df_sfr.sum(axis=1), axis=0)
-    df_init.sfr = df_sfr
+    df_sfr_surf = df_init.sfr_surf.copy()
+    df_sfr_surf = df_sfr_surf.div(df_sfr_surf.sum(axis=1), axis=0)
+    df_init.sfr_surf = df_sfr_surf
 
     return df_init
 

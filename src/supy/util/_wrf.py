@@ -1,7 +1,7 @@
 # WRF-SUEWS related utilities
 import pandas as pd
 import numpy as np
-from .._load import load_SUEWS_nml
+from .._load import load_SUEWS_nml_simple
 from pathlib import Path
 
 
@@ -31,13 +31,13 @@ dict_modis_20 = {
 list_cat_suews = [
     # built-up
     "Paved",
-    "Bldgs",
+    "Building",
     # vegetated
-    "EveTr",
-    "DecTr",
+    "Evergreen Trees",
+    "Deciduous Trees",
     "Grass",
     # soil
-    "Bsoil",
+    "Bare Soil",
     # water
     "Water",
     # not-used
@@ -58,7 +58,7 @@ def extract_reclassification(path_nml: str) -> pd.DataFrame:
     pd.DataFrame
         Reclassification DataFrame with rows for WRF land covers while columns for SUEWS.
     """
-    df_lc = load_SUEWS_nml(path_nml).landuse
+    df_lc = load_SUEWS_nml_simple(path_nml).landuse
 
     ser_cat_suews = pd.Series(list_cat_suews, name="lc_suews")
     df_ind = pd.DataFrame(df_lc.loc["suews_cat_ind"], columns=ser_cat_suews)
@@ -82,15 +82,20 @@ def gen_df_sankey(path_nml: str):
     df_flow = df_rcl.T.reset_index().melt(id_vars=["lc_suews"], value_name="frac")
 
     df_flow = df_flow.rename(
-        {"lc_suews": "target", "lc_wrf": "source", "frac": "value"}, axis=1
+        {
+            "lc_suews": "target",
+            "lc_wrf": "source",
+            "frac": "value",
+        },
+        axis=1,
     )
 
     # label conversion types
 
     def cat_type(x: str) -> str:
-        if x in ["Bldgs", "Paved"]:
+        if x in ["Building", "Paved"]:
             return "Built-up"
-        elif x in ["DecTr", "EveTr", "Grass"]:
+        elif x in ["Deciduous Trees", "Evergreen Trees", "Grass"]:
             return "Vegetated"
         else:
             return x
@@ -115,6 +120,7 @@ def gen_df_sankey(path_nml: str):
 def in_ipynb():
     try:
         from IPython import get_ipython
+
         cfg = get_ipython().has_trait("kernel")
         if cfg:
             return True
@@ -131,8 +137,8 @@ def plot_reclassification(
     height=360,
     top=10,
     bottom=10,
-    left=260,
-    right=60,
+    left=280,
+    right=130,
 ):
     """Produce Sankey Diagram to visualise the reclassification specified in `path_nml`
 
@@ -162,17 +168,16 @@ def plot_reclassification(
     """
     try:
         from floweaver import (
-        Bundle,
-        Dataset,
-        Partition,
-        ProcessGroup,
-        Waypoint,
-        SankeyDefinition,
-        weave,
-    )
+            Bundle,
+            Dataset,
+            Partition,
+            ProcessGroup,
+            Waypoint,
+            SankeyDefinition,
+            weave,
+        )
     except Exception as ie:
         raise ImportError("Please install `floweaver` by `pip install floweaver`.")
-
 
     # derive DataFrames required by Sankey
     df_flow, df_process = gen_df_sankey(path_nml)
@@ -187,8 +192,9 @@ def plot_reclassification(
     list_suews = df_flow.target.unique().tolist()
     # WRF LCs
     list_wrf = df_flow.source.unique().tolist()
-    list_type = df_flow.type.unique().tolist()
     # LC types
+    list_type = df_flow.type.unique()[[1,2,0,3]].tolist()
+    print('list_type:', list_type)
     lc_by_type = Partition.Simple("type", list_type)
 
     nodes = {
@@ -210,8 +216,8 @@ def plot_reclassification(
     # Set the colours for the labels in the partition.
     palette = {
         "Built-up": "slategrey",
-        "Bsoil": "tan",
         "Vegetated": "forestgreen",
+        "Bare Soil": "tan",
         "Water": "royalblue",
     }
 

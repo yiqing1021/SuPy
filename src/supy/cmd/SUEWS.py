@@ -8,7 +8,7 @@ from .._supy_module import init_supy, run_supy, save_supy, load_forcing_grid, pd
 
 from .._version import show_version, __version__, __version_driver__
 
-from .._load import load_SUEWS_nml
+from .._load import load_SUEWS_nml_simple
 
 # run the whole supy workflow mimicking SUEWS binary
 @click.command(short_help="Run SUEWS simulation using settings in PATH_RUNCONTROL")
@@ -43,7 +43,7 @@ SuPy: https://supy.readthedocs.io/
         # load forcing
         list_grid = df_state_init.index
         click.echo(f"\n{list_grid.size} grids detected")
-        ser_runctrl = load_SUEWS_nml(path_runcontrol).runcontrol
+        ser_runctrl = load_SUEWS_nml_simple(path_runcontrol).runcontrol
         flag_multimet = ser_runctrl.multiplemetfiles
 
         if flag_multimet == 1:
