@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from ._env import logger_supy, path_supy_module
-from ._load import dict_var_type_forcing
+from ._load import dict_var_type_forcing, set_var_use
 
 # the check list file with ranges and logics
 path_rules_indiv = path_supy_module / "checker_rules_indiv.json"
@@ -207,28 +207,42 @@ def check_state(df_state: pd.DataFrame) -> List:
     # collect issues
     list_issues = []
     flag_valid = True
-    list_col_state = set(dict_rules_indiv.keys()).difference(
+
+    # these variables dont have to be checked
+    list_var_exclude = [
+        "ts5mindata_ir",
+    ]
+
+    # variables defined in the rule json file:
+    list_col_rule = set(dict_rules_indiv.keys()).difference(
         [x.lower() for x in list_col_forcing]
     )
 
     # check the following:
+    # 0. mandatory variables in supy_driver
+    set_diff = set_var_use.difference(set(list_col_rule).union(set(list_var_exclude)))
+    if len(set_diff) > 0:
+        str_issue = f"Mandatory parameters missing from rule file: {set_diff}"
+        list_issues.append(str_issue)
+        flag_valid = False
+
     # 1. correct columns
-    col_df = df_state.columns.get_level_values("var")
+    col_df_state = df_state.columns.get_level_values("var")
     # 1.1 if all columns are present
-    set_diff = set(list_col_state).difference(col_df)
+    set_diff = set(list_col_rule).difference(col_df_state)
     if len(set_diff) > 0:
         str_issue = f"Mandatory columns missing from df_state: {set_diff}"
         list_issues.append(str_issue)
         flag_valid = False
     # 1.2 if all columns are included in the checking list
-    set_diff = set(col_df).difference(list_col_state)
+    set_diff = set(col_df_state).difference(list_col_rule)
     if len(set_diff) > 0:
         str_issue = f"Columns not included in checking list: {set_diff}"
         list_issues.append(str_issue)
         flag_valid = False
 
     # 2. check based on logic types
-    list_to_check = set(col_df).intersection(list_col_state)
+    list_to_check = set(col_df_state).intersection(list_col_rule)
     for var in list_to_check:
         # pack
         val = dict_rules_indiv[var]

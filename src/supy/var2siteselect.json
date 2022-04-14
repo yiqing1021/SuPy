@@ -655,7 +655,7 @@
     "Code_DecTr": "SDDFull",
     "Code_Grass": "SDDFull"
   },
-  "sfr": [
+  "sfr_surf": [
     "Fr_Paved",
     "Fr_Bldgs",
     "Fr_EveTr",
@@ -716,7 +716,7 @@
     },
     "const": 0.0
   },
-  "soilstorecap": {
+  "soilstorecap_surf": {
     "Code_Paved": {
       "SoilTypeCode": "SoilStoreCap"
     },
@@ -738,7 +738,7 @@
     "const": 0.0
   },
   "startdls": "StartDLS",
-  "statelimit": {
+  "statelimit_surf": {
     "Code_Paved": "StateLimit",
     "Code_Bldgs": "StateLimit",
     "Code_EveTr": "StateLimit",
@@ -946,7 +946,7 @@
       ]
     }
   ],
-  "wetthresh": {
+  "wetthresh_surf": {
     "Code_Paved": "WetThreshold",
     "Code_Bldgs": "WetThreshold",
     "Code_EveTr": "WetThreshold",

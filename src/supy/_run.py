@@ -111,11 +111,6 @@ def suews_cal_tstep_multi(dict_state_start_grid, df_met_forcing_block):
     )
     dict_input = {k: dict_input[k] for k in list_var_input_multitsteps}
 
-    # for var in dict_input:
-    #     print(var)
-    #     print(dict_input[var])
-    #     print(dict_input[var].shape, '\n')
-
     # main calculation:
     try:
         res_suews_tstep_multi = sd.suews_cal_multitsteps(**dict_input)
@@ -283,8 +278,8 @@ def run_supy_ser(
     # dict_state is used to save model states for later use
     dict_state = {
         # (t_start, grid): series_state_init.to_dict()
-        (tstep_init, grid): pack_grid_dict(series_state_init)
-        for grid, series_state_init in df_init.iterrows()
+        (tstep_init, grid): pack_grid_dict(ser_state_init)
+        for grid, ser_state_init in df_init.iterrows()
     }
 
     # remove 'problems.txt'
@@ -359,7 +354,7 @@ def run_supy_ser(
 
             # # construct input list for `Pool.starmap`
             # construct input list for `dask.bag`
-            list_input = [
+            list_dict_input = [
                 # (dict_state[(tstep_init, grid)], df_forcing)
                 dict_state[(tstep_init, grid)]
                 for grid in list_grid
@@ -367,8 +362,8 @@ def run_supy_ser(
 
             try:
                 list_res = [
-                    suews_cal_tstep_multi(input_grid, df_forcing)
-                    for input_grid in list_input
+                    suews_cal_tstep_multi(dict_input_grid, df_forcing)
+                    for dict_input_grid in list_dict_input
                 ]
                 list_state_end, list_output_array = zip(*list_res)
 
@@ -474,9 +469,9 @@ def run_supy_par(df_forcing_tstep, df_state_init_m, save_state, n_yr):
 
 
 # pack one Series of var into np.array
-def pack_var(var_ser):
-    dim = np.array(literal_eval(var_ser.index[-1])) + 1
-    val = np.array(var_ser.values.reshape(dim), order="F")
+def pack_var(ser_var):
+    dim = np.array(literal_eval(ser_var.index[-1])) + 1
+    val = np.array(ser_var.values.reshape(dim), order="F")
     return val
 
 
@@ -486,11 +481,17 @@ def pack_grid_dict(ser_grid):
     list_var_int = df_var_info[(ser_dtype == "int") | (ser_dtype == "array('i')")].index
     list_var = ser_grid.index.levels[0].unique()
     # pack according to dimension info
-    dict_var = {
-        var: pack_var(ser_grid[var])  # .astype(np.float)
-        for var in list_var
-        if var not in ["file_init"]
-    }
+    dict_var = {}
+    for var in list_var:
+        if var not in ["file_init"]:
+            dict_var[var] = pack_var(ser_grid[var]).astype(np.float)
+        else:
+            pass
+    # dict_var = {
+    #     var: pack_var(ser_grid[var])  # .astype(np.float)
+    #     for var in list_var
+    #     if var not in ["file_init"]
+    # }
     # convert to int
     dict_var_int = {
         var: dict_var[var].astype(int) for var in list_var if var in list_var_int

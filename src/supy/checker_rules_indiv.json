@@ -32,15 +32,6 @@
         },
         "unit": "1"
     },
-    "h_maintain": {
-        "cat": "grid",
-        "logic": "range",
-        "param": {
-            "max": "inf",
-            "min": "-inf"
-        },
-        "unit": "mm"
-    },
     "ahprof_24hr": {
         "cat": "grid",
         "logic": "range",
@@ -50,6 +41,42 @@
         },
         "unit": "1"
     },
+    "air_ext_lw": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "air_ext_sw": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "air_ssa_lw": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "air_ssa_sw": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "alb": {
         "cat": "grid",
         "logic": "range",
@@ -58,6 +85,24 @@
             "min": 0
         },
         "unit": "1"
+    },
+    "alb_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "alb_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
     },
     "albdectr_id": {
         "cat": "grid",
@@ -170,6 +215,33 @@
         },
         "unit": "1"
     },
+    "baset_cooling": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": "-inf"
+        },
+        "unit": "1"
+    },
+    "baset_hc": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": "-inf"
+        },
+        "unit": "1"
+    },
+    "baset_heating": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": "-inf"
+        },
+        "unit": "1"
+    },
     "basete": {
         "cat": "grid",
         "logic": "range",
@@ -187,15 +259,6 @@
                 1,
                 2
             ]
-        },
-        "unit": "1"
-    },
-    "baset_hc": {
-        "cat": "grid",
-        "logic": "range",
-        "param": {
-            "max": "inf",
-            "min": "-inf"
         },
         "unit": "1"
     },
@@ -219,6 +282,24 @@
             "min": 0
         },
         "unit": "1"
+    },
+    "building_frac": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "building_scale": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "m"
     },
     "capmax_dec": {
         "cat": "grid",
@@ -249,6 +330,33 @@
             "min": 0
         },
         "unit": "1"
+    },
+    "cp_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "J m-3 K-1"
+    },
+    "cp_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "J m-3 K-1"
+    },
+    "cp_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "J m-3 K-1"
     },
     "cpanohm": {
         "cat": "grid",
@@ -312,6 +420,18 @@
         },
         "unit": "1"
     },
+    "diagmethod": {
+        "cat": "grid",
+        "logic": "method",
+        "param": {
+            "allowed": [
+                0,
+                1,
+                2
+            ]
+        },
+        "unit": "1"
+    },
     "diagnose": {
         "cat": "grid",
         "logic": "NA",
@@ -354,6 +474,33 @@
         "param": {},
         "unit": "1"
     },
+    "dz_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "dz_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "dz_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "ef_umolco2perj": {
         "cat": "grid",
         "logic": "NA",
@@ -368,6 +515,24 @@
             "min": 0
         },
         "unit": "1"
+    },
+    "emis_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "emis_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
     },
     "emissionsmethod": {
         "cat": "grid",
@@ -550,6 +715,15 @@
         },
         "unit": "1"
     },
+    "ground_albedo_dir_mult_fact": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "gsmodel": {
         "cat": "grid",
         "logic": "method",
@@ -561,6 +735,15 @@
         },
         "unit": "1"
     },
+    "h_maintain": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": "-inf"
+        },
+        "unit": "mm"
+    },
     "hdd_id": {
         "cat": "grid",
         "logic": "range",
@@ -569,6 +752,15 @@
             "min": "-inf"
         },
         "unit": "1"
+    },
+    "height": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max":"inf",
+            "min": 0
+        },
+        "unit": "m"
     },
     "humactivity_24hr": {
         "cat": "grid",
@@ -624,31 +816,7 @@
         "param": {},
         "unit": "1"
     },
-    "irrfracpaved": {
-        "cat": "grid",
-        "logic": "NA",
-        "param": {},
-        "unit": "1"
-    },
     "irrfracbldgs": {
-        "cat": "grid",
-        "logic": "NA",
-        "param": {},
-        "unit": "1"
-    },
-    "irrfracevetr": {
-        "cat": "grid",
-        "logic": "NA",
-        "param": {},
-        "unit": "1"
-    },
-    "irrfracdectr": {
-        "cat": "grid",
-        "logic": "NA",
-        "param": {},
-        "unit": "1"
-    },
-    "irrfracgrass": {
         "cat": "grid",
         "logic": "NA",
         "param": {},
@@ -660,11 +828,62 @@
         "param": {},
         "unit": "1"
     },
+    "irrfracdectr": {
+        "cat": "grid",
+        "logic": "NA",
+        "param": {},
+        "unit": "1"
+    },
+    "irrfracevetr": {
+        "cat": "grid",
+        "logic": "NA",
+        "param": {},
+        "unit": "1"
+    },
+    "irrfracgrass": {
+        "cat": "grid",
+        "logic": "NA",
+        "param": {},
+        "unit": "1"
+    },
+    "irrfracpaved": {
+        "cat": "grid",
+        "logic": "NA",
+        "param": {},
+        "unit": "1"
+    },
     "irrfracwater": {
         "cat": "grid",
         "logic": "NA",
         "param": {},
         "unit": "1"
+    },
+    "k_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "k_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "k_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
     },
     "kdiff": {
         "cat": "grid",
@@ -849,6 +1068,33 @@
         },
         "unit": "1"
     },
+    "n_stream_lw_urban": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "n_stream_sw_urban": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "n_vegetation_region_urban": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "narp_emis_snow": {
         "cat": "grid",
         "logic": "NA",
@@ -877,17 +1123,14 @@
         },
         "unit": "1"
     },
-    "diagmethod": {
+    "nlayer": {
         "cat": "grid",
-        "logic": "method",
+        "logic": "range",
         "param": {
-            "allowed": [
-                0,
-                1,
-                2
-            ]
+            "max": 10,
+            "min": 0
         },
-        "unit": "1"
+        "unit": "m3"
     },
     "ohm_coef": {
         "cat": "grid",
@@ -1155,6 +1398,15 @@
         },
         "unit": "%"
     },
+    "roof_albedo_dir_mult_fact": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "roughlenheatmethod": {
         "cat": "grid",
         "logic": "method",
@@ -1228,7 +1480,7 @@
         },
         "unit": "1"
     },
-    "sfr": {
+    "sfr_surf": {
         "cat": "grid",
         "logic": "range",
         "param": {
@@ -1236,6 +1488,24 @@
             "min": 0
         },
         "unit": "1"
+    },
+    "sfr_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "sfr_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
     },
     "smdmethod": {
         "cat": "grid",
@@ -1404,23 +1674,59 @@
         },
         "unit": "1"
     },
-    "soilstore_id": {
+    "soilstore_surf": {
         "cat": "grid",
         "logic": "range",
         "param": {
             "max": "inf",
             "min": 0
         },
-        "unit": "1"
+        "unit": "mm"
     },
-    "soilstorecap": {
+    "soilstore_roof": {
         "cat": "grid",
         "logic": "range",
         "param": {
             "max": "inf",
             "min": 0
         },
-        "unit": "1"
+        "unit": "mm"
+    },
+    "soilstore_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
+    },
+    "soilstorecap_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
+    },
+    "soilstorecap_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
+    },
+    "soilstorecap_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
     },
     "stabilitymethod": {
         "cat": "grid",
@@ -1445,23 +1751,59 @@
         },
         "unit": "1"
     },
-    "state_id": {
+    "state_surf": {
         "cat": "grid",
         "logic": "range",
         "param": {
             "max": "inf",
             "min": 0
         },
-        "unit": "1"
+        "unit": "mm"
     },
-    "statelimit": {
+    "state_roof": {
         "cat": "grid",
         "logic": "range",
         "param": {
             "max": "inf",
             "min": 0
         },
-        "unit": "1"
+        "unit": "m3"
+    },
+    "state_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
+    },
+    "statelimit_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
+    },
+    "statelimit_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
+    },
+    "statelimit_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "mm"
     },
     "storageheatmethod": {
         "cat": "grid",
@@ -1488,23 +1830,14 @@
         },
         "unit": "1"
     },
-    "baset_cooling": {
+    "sw_dn_direct_frac": {
         "cat": "grid",
         "logic": "range",
         "param": {
-            "max": "inf",
-            "min": "-inf"
+            "max": 1,
+            "min": 0
         },
-        "unit": "1"
-    },
-    "baset_heating": {
-        "cat": "grid",
-        "logic": "range",
-        "param": {
-            "max": "inf",
-            "min": "-inf"
-        },
-        "unit": "1"
+        "unit": "m3"
     },
     "Tair": {
         "cat": "grid",
@@ -1545,6 +1878,33 @@
         "param": {},
         "unit": "1"
     },
+    "temp_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "temp_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "temp_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "tempmeltfact": {
         "cat": "grid",
         "logic": "range",
@@ -1577,6 +1937,33 @@
             "min": -24
         },
         "unit": "1"
+    },
+    "tin_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "tin_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "tin_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
     },
     "tl": {
         "cat": "grid",
@@ -1629,6 +2016,33 @@
         },
         "unit": "1"
     },
+    "tsfc_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "tsfc_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "tsfc_wall": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "tstep": {
         "cat": "grid",
         "logic": "range",
@@ -1653,11 +2067,83 @@
         },
         "unit": "m s-1"
     },
+    "use_sw_direct_albedo": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "veg_contact_fraction_const": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "veg_frac": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "veg_fsd_const": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "veg_scale": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "veg_ssa_lw": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
+    "veg_ssa_sw": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 10,
+            "min": 0
+        },
+        "unit": "m3"
+    },
     "veg_type": {
         "cat": "grid",
         "logic": "NA",
         "param": {},
         "unit": "1"
+    },
+    "wall_specular_frac": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": 1,
+            "min": 0
+        },
+        "unit": "m3"
     },
     "waterdist": {
         "cat": "grid",
@@ -1688,7 +2174,25 @@
         },
         "unit": "degree"
     },
-    "wetthresh": {
+    "wetthresh_roof": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+           "max": "inf",
+            "min": 0
+        },
+        "unit": "1"
+    },
+    "wetthresh_surf": {
+        "cat": "grid",
+        "logic": "range",
+        "param": {
+            "max": "inf",
+            "min": 0
+        },
+        "unit": "1"
+    },
+    "wetthresh_wall": {
         "cat": "grid",
         "logic": "range",
         "param": {

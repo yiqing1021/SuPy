@@ -240,13 +240,15 @@ def load_SUEWS_nml(p_nml):
     # xfile = path_insensitive(xfile)
     try:
         p_nml = Path(path_insensitive(str(p_nml))).resolve()
-        df_nml = pd.DataFrame(f90nml.read(p_nml))
+        parser = f90nml.Parser()
+        parser.row_major=True
+        df_nml = pd.DataFrame(parser.read(p_nml))
         dict_nml_raw = {
             name: np.array(row.dropna().values[0]) for name, row in df_nml.iterrows()
         }
         dict_nml = {}
         for k, v in dict_nml_raw.items():
-            # print(k, v)
+            # print(k, v, type(v))
             dict_nml.update(expand_entry(k, v))
         return dict_nml
     except FileNotFoundError:
@@ -1246,11 +1248,22 @@ dict_RunControl_default = {
 
 # load RunControl variables
 def load_SUEWS_dict_ModConfig(path_runcontrol, dict_default=dict_RunControl_default):
+    # load RunControl variables
     dict_RunControl = dict_default.copy()
-    df_RunControl = load_SUEWS_nml_simple(path_runcontrol)
-    ser_RunControl = df_RunControl.loc[:, "runcontrol"]
-    dict_RunControl_x = ser_RunControl.to_dict()
+    dict_RunControl_x = (
+        load_SUEWS_nml_simple(path_runcontrol).loc[:, "runcontrol"].to_dict()
+    )
     dict_RunControl.update(dict_RunControl_x)
+
+    # load SPARTACUS-specific variables: do them here as they are globally set
+    path_spartacus = (
+        path_runcontrol.parent
+        / dict_RunControl["fileinputpath"]
+        / "SUEWS_SPARTACUS.nml"
+    )
+    dict_RunControl_x = {k[0]: v for k, v in load_SUEWS_nml(path_spartacus).items()}
+    dict_RunControl.update(dict_RunControl_x)
+
     return dict_RunControl
 
 
@@ -1335,10 +1348,12 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
     dict_ModConfig = load_SUEWS_dict_ModConfig(path_runcontrol)
     # path for SUEWS input tables:
     path_input = path_runcontrol.parent / dict_ModConfig["fileinputpath"]
+
     logger_supy.debug("loading df_gridSurfaceChar")
     df_gridSurfaceChar = load_SUEWS_SurfaceChar_df(path_input)
     # df_gridSurfaceChar.to_pickle("df_gridSurfaceChar.pkl")
-    logger_supy.debug("df_gridSurfaceChar.pkl saved!")
+    # logger_supy.debug("df_gridSurfaceChar.pkl saved!")
+
     # only use the first year of each grid as base for initial conditions
     logger_supy.debug("grouping grids")
     grp_df = df_gridSurfaceChar.sort_values(("year", "0")).groupby("Grid")
@@ -1358,11 +1373,21 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 
     # incorporate numeric entries from dict_ModConfig
     logger_supy.debug("incorporating runcontrol numeric entries")
-    list_var_dim_from_dict_ModConfig = [
-        (var, 0, val)
-        for var, val in dict_ModConfig.items()
-        if isinstance(val, (float, int))
-    ]
+    list_var_dim_from_dict_ModConfig = []
+    for var, val in dict_ModConfig.items():
+        if isinstance(val, (float, int, np.int64, np.float64, np.bool_)):
+            list_var_dim_from_dict_ModConfig.append((var, 0, val))
+        elif isinstance(val, (str)):
+            pass
+        else:
+            print(
+                var,
+                val,
+                type(val),
+                "is not included: this should not happen!",
+                "please report to the developer: https://github.com/UMEP-dev/SuPy/issues/new",
+            )
+
     # set values according to `list_var_dim_from_dict_ModConfig`
     # and generate the secondary dimensions
     df_init = modify_df_init(df_init, list_var_dim_from_dict_ModConfig)
@@ -1396,9 +1421,7 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
         df_init.index.astype(str) if dict_ModConfig["multipleinitfiles"] == 1 else ""
     )
     year_str = df_init[("year", "0")].astype(int).astype(str)
-    # ser_path_init =base_str + grid_str + '_' + year_str + '.nml'
     df_init[("file_init", "0")] = base_str + grid_str + "_" + year_str + ".nml"
-    # ser_path_init = ser_path_init.map(lambda fn: path_input / fn)
     df_init[("file_init", "0")] = df_init[("file_init", "0")].map(
         lambda fn: path_input / fn
     )
@@ -1423,6 +1446,8 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 def expand_entry(k, v):
     ar = np.array(v)
     ind_dim = ar.shape
+    if len(ind_dim) >1:
+        logger_supy.debug('debugging in expand_entry:',k,ind_dim)
     dict_exp = {
         (k, "0" if index == () else str(index)): ar[index]
         for index in np.ndindex(ind_dim)
@@ -1569,8 +1594,8 @@ def add_sfc_init_df(df_init):
     dict_var_sfc.update(
         {
             "snowwater": ["snowwater{}state".format(sfc) for sfc in list_sfc],
-            "soilstore_id": ["soilstore{}state".format(sfc) for sfc in list_sfc],
-            "state_id": ["{}state".format(sfc) for sfc in list_sfc],
+            "soilstore_surf": ["soilstore{}state".format(sfc) for sfc in list_sfc],
+            "state_surf": ["{}state".format(sfc) for sfc in list_sfc],
         }
     )
 
@@ -1656,6 +1681,39 @@ def add_state_init_df(df_init):
     return df_init
 
 
+# add initial temperatures into `df_init`
+def add_temp_init_df(df_init):
+    list_var_add = [
+        "tsfc_surf",
+        "tsfc_roof",
+        "tsfc_wall",
+        "temp_wall",
+        "temp_roof",
+        "temp_surf",
+    ]
+
+    # temperature of all inner layers
+    ndepth = 5
+    temp_init = np.repeat(df_init.filter(like="tin_").values, ndepth, axis=1)
+    df_temp = df_init.filter(like="cp_").rename(
+        lambda var: var.replace("cp", "temp"), axis="columns", level="var"
+    )
+    df_temp.columns = df_temp.columns.remove_unused_levels()
+    df_temp.loc[:, :] = temp_init
+
+    # temperature at facet surface
+    df_sfc = df_init.filter(like="tin_").rename(
+        lambda var: var.replace("tin", "tsfc"), axis="columns", level="var"
+    )
+    df_sfc.columns = df_sfc.columns.remove_unused_levels()
+    df_sfc.loc[:, :] = df_init.filter(like="tin_").values
+
+    # merge the two dataframes
+    df_init= pd.concat([df_init, df_temp, df_sfc], axis=1)
+
+    return df_init
+
+
 # add additional parameters to `df` produced by `load_SUEWS_InitialCond_df`
 def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     # clean all cached states
@@ -1674,12 +1732,12 @@ def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     # load base df of InitialCond
     logger_supy.debug("loading base df_init...")
     df_init = load_SUEWS_InitialCond_df(path_runcontrol)
+    # if 'state_surf' in df_init.columns:
+    #     print('state_surf is in df_init')
 
     # add Initial Condition variables from namelist file
     logger_supy.debug("adding initial conditions...")
     df_init = add_file_init_df(df_init)
-    # df_init.to_pickle("df_init.pkl")
-    # print("df_init saved!")
 
     # add surface specific info into `df_init`
     logger_supy.debug("adding surface specific conditions...")
@@ -1697,7 +1755,14 @@ def load_InitialCond_grid_df(path_runcontrol, force_reload=True):
     logger_supy.debug("adding grid layout info...")
     df_init = add_file_gridlayout_df(df_init)
 
-    # # sort column names for consistency
+    # df_init.to_pickle("df_init.pkl")
+    # print("df_init saved!")
+
+    # add Initial temperatures into `df_init`
+    logger_supy.debug("adding initial temperatures...")
+    df_init = add_temp_init_df(df_init)
+
+    # sort column names for consistency
     logger_supy.debug("setting grid level...")
     df_init.index.set_names("grid", inplace=True)
 
