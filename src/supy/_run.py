@@ -50,12 +50,16 @@ def suews_cal_tstep(dict_state_start, dict_met_forcing_tstep):
     # use single dict as input for suews_cal_main
     dict_input = copy.deepcopy(dict_state_start)
     dict_input.update(dict_met_forcing_tstep)
+
+    for var in list_var_input:
+        if var in dict_input:
+            pass
+        else:
+            print(f'{var} is not in dict_input')
+            print('\n')
+
     dict_input = {k: dict_input[k] for k in list_var_input}
 
-    # for var in dict_input:
-    #     print(var)
-    #     print(dict_input[var])
-    #     print('\n')
 
     # main calculation:
     try:
@@ -217,7 +221,7 @@ def run_supy_ser(
             "Tair": "temp_c",
             "pres": "press_hpa",
             "rain": "precip",
-            "kdown": "avkdn",
+            "kdown": "kdown",
             "snow": "snowfrac_obs",
             "ldown": "ldown_obs",
             "fcld": "fcld_obs",
@@ -246,7 +250,7 @@ def run_supy_ser(
         "temp_c",
         "press_hpa",
         "precip",
-        "avkdn",
+        "kdown",
         "snowfrac_obs",
         "ldown_obs",
         "fcld_obs",

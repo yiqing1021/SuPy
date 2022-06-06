@@ -490,7 +490,7 @@
             "max": 10,
             "min": 0
         },
-        "unit": "m3"
+        "unit": "m"
     },
     "dz_wall": {
         "cat": "grid",
@@ -499,7 +499,7 @@
             "max": 10,
             "min": 0
         },
-        "unit": "m3"
+        "unit": "m"
     },
     "ef_umolco2perj": {
         "cat": "grid",
@@ -520,19 +520,19 @@
         "cat": "grid",
         "logic": "range",
         "param": {
-            "max": 10,
+            "max": 1,
             "min": 0
         },
-        "unit": "m3"
+        "unit": "1"
     },
     "emis_wall": {
         "cat": "grid",
         "logic": "range",
         "param": {
-            "max": 10,
+            "max": 1,
             "min": 0
         },
-        "unit": "m3"
+        "unit": "1"
     },
     "emissionsmethod": {
         "cat": "grid",
@@ -1320,13 +1320,13 @@
         },
         "unit": "W m-2"
     },
-    "qn1_av": {
+    "qn_av": {
         "cat": "grid",
         "logic": "NA",
         "param": {},
         "unit": "1"
     },
-    "qn1_s_av": {
+    "qn_s_av": {
         "cat": "grid",
         "logic": "NA",
         "param": {},

@@ -101,7 +101,7 @@ def save_df_grid_group(df_year, grid, group, dir_save, site):
     # processing path
     path_dir = Path(dir_save)
     # pandas bug here: monotonic datetime index would lose `freq` once `pd.concat`ed
-    if df_year.shape[0] > 0 and df_year.index.size > 2:
+    if df_year.shape[0] > 0 and df_year.index.size >= 2:
         ind = df_year.index
         freq_cal = ind[1] - ind[0]
         df_year = df_year.asfreq(freq_cal)
@@ -109,8 +109,12 @@ def save_df_grid_group(df_year, grid, group, dir_save, site):
         df_year = df_year.asfreq("5T")
     # output frequency in min
     freq_min = int(df_year.index.freq.delta.total_seconds() / 60)
-    # staring year
-    year = df_year.index[0].year
+    # starting year
+    try:
+        year = df_year.index[0].year
+    except:
+        print(df_year)
+
     # sample file name: 'Kc98_2012_SUEWS_60.txt'
     file_out = f"{site}{grid}_{year}_{group}_{freq_min}.txt"
     # 'DailyState_1440' will be trimmed
@@ -335,10 +339,11 @@ def save_df_ser(df_save, path_dir_save, site, output_level):
             # for naming files
             for year in list_year:
                 df_year = gen_df_year(df_save, year, grid, group, output_level)
-                path_save = save_df_grid_group(
-                    df_year, grid, group, path_dir_save, site
-                )
-                list_path_save_df.append(path_save)
+                if df_year.shape[0]>0:
+                    path_save = save_df_grid_group(
+                        df_year, grid, group, path_dir_save, site
+                    )
+                    list_path_save_df.append(path_save)
     return list_path_save_df
 
 

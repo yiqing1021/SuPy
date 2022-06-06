@@ -1331,8 +1331,8 @@ dict_InitCond_out = {
 # extra items used in supy
 dict_InitCond_extra = {
     "leavesoutinitially": int(nan),
-    "qn1_av": 0,
-    "qn1_s_av": 0,
+    "qn_av": 0,
+    "qn_s_av": 0,
     "dqndt": 0,
     "dqnsdt": 0,
 }
