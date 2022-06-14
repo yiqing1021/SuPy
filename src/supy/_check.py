@@ -2,6 +2,7 @@
 # import yaml
 # yaml.warnings({'YAMLLoadWarning': False})
 import json
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -9,6 +10,7 @@ import pandas as pd
 
 from ._env import logger_supy, path_supy_module
 from ._load import dict_var_type_forcing, set_var_use
+
 
 # the check list file with ranges and logics
 path_rules_indiv = path_supy_module / "checker_rules_indiv.json"
@@ -202,7 +204,7 @@ def check_forcing(df_forcing: pd.DataFrame, fix=False):
             return df_forcing
 
 
-def check_state(df_state: pd.DataFrame) -> List:
+def check_state(df_state: pd.DataFrame, fix=True) -> List:
     logger_supy.info("SuPy is validating `df_state`...")
     # collect issues
     list_issues = []
@@ -270,7 +272,13 @@ def check_state(df_state: pd.DataFrame) -> List:
     if not flag_valid:
         str_issue = "\n".join(["Issues found in `df_state`:"] + list_issues)
         logger_supy.error(str_issue)
-        return list_issues
+        if not fix:
+            return list_issues
+        else:
+            logger_supy.info(
+                "Any issue detected will be fixed by filling dummy values: please check the results with caution!"
+            )
+            return upgrade_df_state(df_state)
     else:
         logger_supy.info("All checks for `df_state` passed!")
 
@@ -293,3 +301,69 @@ def flatten_col(df_state: pd.DataFrame):
     # replace columns with flattened ones
     df_state_flat = df_state.set_axis(col_flat)
     return df_state_flat
+
+
+# upgrade df_state from earlier versions of SuPy
+def upgrade_df_state(df_state: pd.DataFrame) -> pd.DataFrame:
+    df_state_deprecated = df_state.copy()
+    # check if a df_state is before v2021a7
+    if "sfr" in df_state.columns:
+        logger_supy.info("A deprecated df_state is detected. Upgrading...")
+        flag_upgrade = True
+    else:
+        logger_supy.info("The df_state is up to date. No upgrade required.")
+        flag_upgrade = False
+
+    # if so, upgrade it
+    if flag_upgrade:
+        from ._supy_module import init_supy
+
+        # load base df_state
+        path_SampleData = Path(path_supy_module) / "sample_run"
+        path_runcontrol = path_SampleData / "RunControl.nml"
+        df_state_base = init_supy(path_runcontrol, force_reload=False)
+
+        # rename columns
+        dict_col_rename = {
+            # these columns are renamed since v2021a7
+            "sfr": "sfr_surf",
+            "wetthresh": "wetthresh_surf",
+            "soilstore_id": "soilstore_surf",
+            "soilstorecap": "soilstorecap_surf",
+            "state_id": "state_surf",
+            "statelimit": "statelimit_surf",
+            "qn1_av": "qn_av",
+            "qn1_s_av": "qn_s_av",
+        }
+        for c_old, c_new in dict_col_rename.items():
+            logger_supy.info(f"Column `{c_old}` is renamed to: `{c_new}`")
+        df_state_upgrade = df_state_deprecated.rename(columns=dict_col_rename)
+
+        # expand df_state_init to match df_state_init_test
+        n_row, n_col = df_state_upgrade.shape
+        df_state_init_base = df_state_base.loc[df_state_base.index.repeat(n_row)].copy()
+        df_state_init_base.index = df_state_upgrade.index
+
+        # add missing columns from sample data
+        dict_col_add = {}
+        for c in df_state_init_base.columns:
+            if c in df_state_upgrade.columns:
+                continue
+            else:
+                dict_col_add[c] = df_state_init_base[c]
+                logger_supy.info(
+                    f"A new column `{c}` is added with values: {dict_col_add[c].values}"
+                )
+
+        # merge processed dataframes
+        df_state_init_add = pd.concat(dict_col_add, axis=1)
+        df_state_upgrade = pd.concat([df_state_init_add, df_state_upgrade], axis=1)
+
+        # add column levels
+        df_state_upgrade.columns = df_state_upgrade.columns.set_names(
+            ["var", "ind_dim"]
+        )
+
+        return df_state_upgrade
+    else:
+        return df_state_deprecated
