@@ -241,7 +241,7 @@ def load_SUEWS_nml(p_nml):
     try:
         p_nml = Path(path_insensitive(str(p_nml))).resolve()
         parser = f90nml.Parser()
-        parser.row_major=True
+        parser.row_major = True
         df_nml = pd.DataFrame(parser.read(p_nml))
         dict_nml_raw = {
             name: np.array(row.dropna().values[0]) for name, row in df_nml.iterrows()
@@ -654,15 +654,25 @@ def set_index_dt(df_raw: pd.DataFrame) -> pd.DataFrame:
         .map(lambda dt: pd.to_datetime(dt, format="%Y %j %H %M")),
         periods=df_raw.shape[0],
     )
-
-    # check if datetime index is evenly spaced:
-    dt_diff = idx_dt.to_series().diff()
-    if (~dt_diff[1:].duplicated()).sum() > 1:
+    list_dt = [
+        *df_raw.iloc[:, :4]
+        .astype(int)
+        .astype(str)
+        .apply(lambda ser: ser.str.cat(sep=" "), axis=1)
+        .map(lambda dt: pd.to_datetime(dt, format="%Y %j %H %M"))
+    ]
+    ser_dt = pd.DatetimeIndex(list_dt).to_series()
+    ser_dt_diff = ser_dt.diff().dt.total_seconds()
+    # check if the timestamps are in order
+    dif_dt = ser_dt_diff.abs().min()
+    ser_test = ser_dt_diff.eq(dif_dt)
+    if ~ser_test.all():
         # locate the problematic indices
-        loc_issue = df_raw.index[~dt_diff.duplicated()][1:]
-        raise RuntimeError(f"Loaded forcing files have gaps at: {loc_issue}")
+        loc_issue =ser_dt_diff.reset_index().index[~ser_test][1:]+2
+        # loc_issue = df_raw[1:].index[~ser_test]
+        raise RuntimeError(f"Loaded forcing files have gaps/duplicates at lines: {loc_issue.to_list()}")
     else:
-        freq = dt_diff[1]
+        freq = ser_dt_diff[1]
         df_datetime = df_raw.set_index(idx_dt).asfreq(freq)
 
     return df_datetime
@@ -1446,8 +1456,8 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
 def expand_entry(k, v):
     ar = np.array(v)
     ind_dim = ar.shape
-    if len(ind_dim) >1:
-        logger_supy.debug('debugging in expand_entry:',k,ind_dim)
+    if len(ind_dim) > 1:
+        logger_supy.debug("debugging in expand_entry:", k, ind_dim)
     dict_exp = {
         (k, "0" if index == () else str(index)): ar[index]
         for index in np.ndindex(ind_dim)
@@ -1709,7 +1719,7 @@ def add_temp_init_df(df_init):
     df_sfc.loc[:, :] = df_init.filter(like="tin_").values
 
     # merge the two dataframes
-    df_init= pd.concat([df_init, df_temp, df_sfc], axis=1)
+    df_init = pd.concat([df_init, df_temp, df_sfc], axis=1)
 
     return df_init
 
