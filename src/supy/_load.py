@@ -662,18 +662,25 @@ def set_index_dt(df_raw: pd.DataFrame) -> pd.DataFrame:
         .map(lambda dt: pd.to_datetime(dt, format="%Y %j %H %M"))
     ]
     ser_dt = pd.DatetimeIndex(list_dt).to_series()
-    ser_dt_diff = ser_dt.diff().dt.total_seconds()
+    ser_dt_diff = ser_dt.diff()
+    ser_dt_diff_sec = ser_dt_diff.dt.total_seconds()
     # check if the timestamps are in order
-    dif_dt = ser_dt_diff.abs().min()
-    ser_test = ser_dt_diff.eq(dif_dt)
-    if ~ser_test.all():
-        # locate the problematic indices
-        loc_issue =ser_dt_diff.reset_index().index[~ser_test][1:]+2
-        # loc_issue = df_raw[1:].index[~ser_test]
-        raise RuntimeError(f"Loaded forcing files have gaps/duplicates at lines: {loc_issue.to_list()}")
-    else:
+    dif_dt = ser_dt_diff_sec.abs().min()
+    ser_test = ser_dt_diff_sec.eq(dif_dt)
+    loc_issue = ser_dt_diff_sec.reset_index().index[~ser_test][1:] + 2
+    if loc_issue.size == 0:
+        # empty list of `loc_issue`
         freq = ser_dt_diff[1]
         df_datetime = df_raw.set_index(idx_dt).asfreq(freq)
+    else:
+        # non-empty list of `loc_issue`
+        # locate the problematic indices
+        # loc_issue = df_raw[1:].index[~ser_test]
+        raise RuntimeError(
+            f"Loaded forcing files have gaps/duplicates; "
+            f"suspious lines include: {loc_issue.to_list()}. "
+            f"NOTE: the reported line numbers are NOT completely accurate: only for your reference."
+        )
 
     return df_datetime
 

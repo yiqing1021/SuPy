@@ -64,7 +64,7 @@ setup(
         "numdifftools",  # required by `lmfit` for uncertainty estimation
         "pvlib",  # TMY-related solar radiation calculations
         "platypus-opt==1.0.4",  # a multi-objective optimiser
-        "supy_driver==2021a7",  # a separate f2py-based driver
+        "supy_driver==2021a8",  # a separate f2py-based driver
     ],
     extras_require={
         "hdf": [

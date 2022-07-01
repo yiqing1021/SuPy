@@ -488,7 +488,7 @@ def pack_grid_dict(ser_grid):
     dict_var = {}
     for var in list_var:
         if var not in ["file_init"]:
-            dict_var[var] = pack_var(ser_grid[var]).astype(np.float)
+            dict_var[var] = pack_var(ser_grid[var]).astype(float)
         else:
             pass
     # dict_var = {
