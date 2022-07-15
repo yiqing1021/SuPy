@@ -427,6 +427,16 @@ def gen_req_ml(fn_sfc, grid=None, scale=0):
     return dict_req_ml
 
 
+@contextlib.contextmanager
+def chdir(path):
+    orig = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(orig)
+
+
 def download_cds(fn, dict_req):
     import cdsapi
     import tempfile
@@ -439,11 +449,11 @@ def download_cds(fn, dict_req):
         logger_supy.info(f"To download: {fn}")
 
         # this will download the file to a secure temporary directory without requirement for extra permission
-        td = tempfile.gettempdir()
-        os.chdir(td)
-        c.retrieve(**dict_req)
-        # move the downloaded file to desired location
-        shutil.move(path_fn.name, fn)
+        with tempfile.TemporaryDirectory() as td:
+            with chdir(td):
+                c.retrieve(**dict_req)
+                # move the downloaded file to desired location
+                shutil.move(path_fn.name, fn)
         # hold on a bit for the next request
         time.sleep(0.0100)
 
