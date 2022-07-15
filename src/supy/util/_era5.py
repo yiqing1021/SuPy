@@ -5,6 +5,7 @@ import os
 import shutil
 import time
 import warnings
+import contextlib
 from pathlib import Path
 
 import numpy as np
@@ -463,6 +464,7 @@ def download_era5(
     lon_x: float,
     start: str,
     end: str,
+    simple_mode: bool,
     dir_save=Path("."),
     grid=None,
     scale=0,
@@ -521,14 +523,15 @@ def download_era5(
         download_cds(path_dir_save / fn_sfc, dict_req)
 
     dict_req_ml = {}
-    for fn_sfc in dict_req_sfc.keys():
-        dict_req = gen_req_ml(path_dir_save / fn_sfc, grid, scale)
-        dict_req_ml.update(dict_req)
+    if simple_mode is False:
+        for fn_sfc in dict_req_sfc.keys():
+            dict_req = gen_req_ml(path_dir_save / fn_sfc, grid, scale)
+            dict_req_ml.update(dict_req)
 
-    logger_supy.debug(dict_req_ml)
+        logger_supy.debug(dict_req_ml)
 
-    for fn_ml, dict_req in dict_req_ml.items():
-        download_cds(path_dir_save / fn_ml, dict_req)
+        for fn_ml, dict_req in dict_req_ml.items():
+            download_cds(path_dir_save / fn_ml, dict_req)
 
     dict_req_all = {**dict_req_sfc, **dict_req_ml}
     dict_req_all = {
@@ -544,6 +547,7 @@ def gen_req_era5(
     lon_x: float,
     start: str,
     end: str,
+    simple_mode: bool,
     grid=None,
     scale=0,
     dir_save=Path("."),
@@ -587,9 +591,10 @@ def gen_req_era5(
 
     # generate requests for atmospheric level data
     dict_req_ml = {}
-    for fn_sfc in dict_req_sfc.keys():
-        dict_req = gen_req_ml(path_dir_save / fn_sfc, grid, scale)
-        dict_req_ml.update(dict_req)
+    if simple_mode is False:
+        for fn_sfc in dict_req_sfc.keys():
+            dict_req = gen_req_ml(path_dir_save / fn_sfc, grid, scale)
+            dict_req_ml.update(dict_req)
 
     # collect all requests
     dict_req_all = {**dict_req_sfc, **dict_req_ml}
@@ -606,6 +611,7 @@ def load_filelist_era5(
     lon_x: float,
     start: str,
     end: str,
+    simple_mode: bool,
     grid=None,
     scale=0,
     dir_save=".",
@@ -619,12 +625,12 @@ def load_filelist_era5(
     if force_download:
         # force download all required files
         download_era5(
-            lat_x, lon_x, start, end, path_dir_save, grid, scale, logging_level
+            lat_x, lon_x, start, end, simple_mode, path_dir_save, grid, scale, logging_level
         )
 
         # attempt to generate requests
         dict_req_all = gen_req_era5(
-            lat_x, lon_x, start, end, grid, scale, path_dir_save
+            lat_x, lon_x, start, end, simple_mode, grid, scale, path_dir_save
         )
 
         # downloaded files
@@ -717,7 +723,7 @@ def gen_forcing_era5(
 
     # download data
     list_fn_sfc, list_fn_ml = load_filelist_era5(
-        lat_x, lon_x, start, end, grid, scale, dir_save, force_download, logging_level
+        lat_x, lon_x, start, end, simple_mode, grid, scale, dir_save, force_download, logging_level
     )
 
     # load data from from `sfc` files
@@ -855,46 +861,14 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
     # close dangling handlers
     ds_sfc.close()
 
-    # load data from from `ml` files
-    ds_ml = xr.open_mfdataset(
-        list_fn_ml,
-        concat_dim="time",
-        combine="nested",
-    ).load()
-    # close dangling handlers
-    ds_ml.close()
-
     # surface level atmospheric pressure
     pres_z0 = ds_sfc.sp
 
     # hgt_agl_diag: height where to calculate diagnostics
     # hgt_agl_diag = 100
 
-    # determine a lowest level higher than surface at all times
-    level_sel = get_level_diag(ds_sfc, ds_ml, hgt_agl_diag)
-
-    # retrieve variables from the identified lowest level
-    ds_ll = ds_ml.sel(level=level_sel)
-
     # altitude
     alt_z0 = geopotential2geometric(ds_sfc.z, ds_sfc.latitude)
-    alt_za = geopotential2geometric(ds_ll.z, ds_ll.latitude)
-
-    # atmospheric pressure [Pa]
-    pres_za = pres_z0 * 0 + ds_ll.level * 100
-
-    # u-wind [m s-1]
-    u_za = ds_ll.u
-    # u-wind [m s-1]
-    v_za = ds_ll.v
-    # wind speed [m s-1]
-    uv_za = np.sqrt(u_za ** 2 + v_za ** 2)
-
-    # temperature [K]
-    t_za = ds_ll.t
-
-    # specific humidity [kg kg-1]
-    q_za = ds_ll.q
 
     # ------------------------
     # retrieve surface data
@@ -923,13 +897,56 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
 
     # specific humidity
     q2 = ac("qv", Td=d2, T=t2, p=pres_z0)
-
     # diagnose wind, temperature and humidity at 100 m agl or `hgt_agl_max` (see below)
     # conform dimensionality using an existing variable
-    za = alt_za - alt_z0
-    z = za * 0 + hgt_agl_diag
+    z = hgt_agl_diag
     da_alt_z = (alt_z0 + z).rename("alt_z")
     ds_alt_z = da_alt_z.to_dataset()
+
+    if simple_mode is False:
+        # load data from from `ml` files
+        ds_ml = xr.open_mfdataset(
+                list_fn_ml,
+                concat_dim="time",
+                combine="nested",
+            ).load()
+            # close dangling handlers
+        ds_ml.close()
+
+        # hgt_agl_diag: height where to calculate diagnostics
+        # hgt_agl_diag = 100
+
+        # determine a lowest level higher than surface at all times
+        level_sel = get_level_diag(ds_sfc, ds_ml, hgt_agl_diag)
+
+        # retrieve variables from the identified lowest level
+        ds_ll = ds_ml.sel(level=level_sel)
+
+        # altitude
+        alt_za = geopotential2geometric(ds_ll.z, ds_ll.latitude)
+
+        # atmospheric pressure [Pa]
+        pres_za = pres_z0 * 0 + ds_ll.level * 100
+
+        # u-wind [m s-1]
+        u_za = ds_ll.u
+        # u-wind [m s-1]
+        v_za = ds_ll.v
+        # wind speed [m s-1]
+        uv_za = np.sqrt(u_za ** 2 + v_za ** 2)
+
+        # temperature [K]
+        t_za = ds_ll.t
+
+        # specific humidity [kg kg-1]
+        q_za = ds_ll.q
+
+        # diagnose wind, temperature and humidity at 100 m agl or `hgt_agl_max` (see below)
+        # conform dimensionality using an existing variable
+        za = alt_za - alt_z0
+        z = za * 0 + hgt_agl_diag
+        da_alt_z = (alt_z0 + z).rename("alt_z")
+        ds_alt_z = da_alt_z.to_dataset()
 
     # get dataset of diagnostics
     if simple_mode:
@@ -942,6 +959,8 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
             q2,
             z,
         )
+        # merge altitude
+        ds_diag = ds_diag.merge(ds_alt_z)
     else:
         ds_diag = diag_era5(
             za,
@@ -960,8 +979,8 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
             z,
         )
 
-    # merge altitude
-    ds_diag = ds_diag.merge(ds_alt_z).drop_vars("level")
+        # merge altitude
+        ds_diag = ds_diag.merge(ds_alt_z).drop_vars("level")
 
     return ds_diag
 
