@@ -1,9 +1,11 @@
 from setuptools import setup
-import pandas as pd
+import json
 
-ser_ver = pd.read_json("./supy/supy_version.json", typ="series", convert_dates=False)
-print(ser_ver)
-__version__ = f"{ser_ver.ver_milestone}.{ser_ver.ver_major}.{ser_ver.ver_minor}{ser_ver.ver_remark}"
+with open("./supy/supy_version.json") as f:
+    dict_ver = json.load(f)
+
+print(dict_ver)
+__version__ = f"{dict_ver['ver_milestone']}.{dict_ver['ver_major']}.{dict_ver['ver_minor']}{dict_ver['ver_remark']}"
 
 
 def readme():
