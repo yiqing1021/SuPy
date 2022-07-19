@@ -91,7 +91,7 @@ def cal_rs_iPM(qh, qe, ta, rh, pa, ra):
     arr_es = ac("es", p=pa, T=ta_K)
     arr_vpd = arr_es - arr_e
     #
-    ser_rs_1 = ((ser_des_dTa / ser_gamma) * (qh / qe) - 1) * ra
+    ser_rs_1 = (ser_des_dTa / ser_gamma) * (qh / qe - 1) * ra
     ser_rs_2 = val_rho * val_cp * arr_vpd / (ser_gamma * qe)
     ser_rs = ser_rs_1 + ser_rs_2
 
@@ -103,11 +103,6 @@ def cal_rs_iPM(qh, qe, ta, rh, pa, ra):
         pass
 
     return ser_rs
-    # return pd.concat(
-    #     (ser_rs, ser_rs_1, ser_rs_2, ser_des_dTa, ser_gamma, qh / qe),
-    #     axis=1,
-    #     keys=("rs", "rs_1", "rs_2", "s", "gamma", "qh_qe"),
-    # )
 
 
 def cal_rs_FG(qh, qe, ta, rh, pa, ra):
@@ -724,9 +719,9 @@ def deriv_g_ta_noah(b1):
 
 def deriv_g_dq_noah(hs):
     ar_dq = np.linspace(0, 20, 100)
-    ser_dq = pd.Series(ar_dq * 1e-3, index=ar_dq)
+    ser_dq = pd.Series(ar_dq*1e-3, index=ar_dq)
     ser_g = cal_g_dq_noah(ser_dq, hs)
-    res_fit = fit_g_dq(ser_dq * 1e3, ser_g)
+    res_fit = fit_g_dq(ser_dq*1e3, ser_g)
     return res_fit
 
 

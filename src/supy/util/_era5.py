@@ -52,7 +52,7 @@ def _geoid_radius(latitude: float) -> float:
         GEOID Radius (meters)
     """
     lat = deg2rad(latitude)
-    return sqrt(1 / (cos(lat) ** 2 / Rmax_WGS84**2 + sin(lat) ** 2 / Rmin_WGS84**2))
+    return sqrt(1 / (cos(lat) ** 2 / Rmax_WGS84 ** 2 + sin(lat) ** 2 / Rmin_WGS84 ** 2))
 
 
 def geometric2geopotential(z: float, latitude: float) -> float:
@@ -625,15 +625,7 @@ def load_filelist_era5(
     if force_download:
         # force download all required files
         download_era5(
-            lat_x,
-            lon_x,
-            start,
-            end,
-            simple_mode,
-            path_dir_save,
-            grid,
-            scale,
-            logging_level,
+            lat_x, lon_x, start, end, simple_mode, path_dir_save, grid, scale, logging_level
         )
 
         # attempt to generate requests
@@ -731,16 +723,7 @@ def gen_forcing_era5(
 
     # download data
     list_fn_sfc, list_fn_ml = load_filelist_era5(
-        lat_x,
-        lon_x,
-        start,
-        end,
-        simple_mode,
-        grid,
-        scale,
-        dir_save,
-        force_download,
-        logging_level,
+        lat_x, lon_x, start, end, simple_mode, grid, scale, dir_save, force_download, logging_level
     )
 
     # load data from from `sfc` files
@@ -893,7 +876,7 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
     # wind speed
     u10 = ds_sfc.u10
     v10 = ds_sfc.v10
-    uv10 = np.sqrt(u10**2 + v10**2)
+    uv10 = np.sqrt(u10 ** 2 + v10 ** 2)
 
     # sensible/latent heat flux [W m-2]
     # conversion from cumulative value to hourly average
@@ -923,11 +906,11 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
     if simple_mode is False:
         # load data from from `ml` files
         ds_ml = xr.open_mfdataset(
-            list_fn_ml,
-            concat_dim="time",
-            combine="nested",
-        ).load()
-        # close dangling handlers
+                list_fn_ml,
+                concat_dim="time",
+                combine="nested",
+            ).load()
+            # close dangling handlers
         ds_ml.close()
 
         # hgt_agl_diag: height where to calculate diagnostics
@@ -950,7 +933,7 @@ def gen_ds_diag_era5(list_fn_sfc, list_fn_ml, hgt_agl_diag=100, simple_mode=True
         # u-wind [m s-1]
         v_za = ds_ll.v
         # wind speed [m s-1]
-        uv_za = np.sqrt(u_za**2 + v_za**2)
+        uv_za = np.sqrt(u_za ** 2 + v_za ** 2)
 
         # temperature [K]
         t_za = ds_ll.t
@@ -1020,7 +1003,7 @@ def diag_era5_simple(z0m, ustar, pres_z0, uv10, t2, q2, z):
 
     # barometric equation with varying temperature:
     # (https://en.wikipedia.org/wiki/Barometric_formula)
-    p_z = pres_z0 * (t_z / t2) ** (grav / (rd * env_lapse))
+    p_z = pres_z0 * (t2 / t_z) ** (grav / (rd * env_lapse))
 
     # correct humidity assuming invariable relative humidity
     RH_z = ac("RH", qv=q2, p=pres_z0, T=t2) + 0 * t_z
@@ -1079,7 +1062,7 @@ def diag_era5(
     # qstar = -qe / (lv_j_kg * avdens) / ustar
 
     # Obukhov length
-    l_mod = ustar**2 / (g / t2 * kappa * tstar)
+    l_mod = ustar ** 2 / (g / t2 * kappa * tstar)
     zoL = np.where(
         np.abs((z + z0m) / l_mod) < 5,
         (z + z0m) / l_mod,
@@ -1184,13 +1167,13 @@ def get_era5_pressure_level(list_fn_ml, pressure_level):
     ds_alt_z = da_alt_z.rename("alt_z").to_dataset()
 
     # wind speed
-    uv_z = (ds_ml_p.u**2 + ds_ml_p.v**2) ** 0.5
+    uv_z = (ds_ml_p.u ** 2 + ds_ml_p.v ** 2) ** 0.5
 
     # air temperature
     t_z = ds_ml_p.t
 
     # atmospheric pressure (hPa to Pa)
-    p_z = pressure_level * 100 + t_z * 0
+    p_z = pressure_level*100 + t_z * 0
 
     # specific humidity
     q_z = ds_ml_p.q
