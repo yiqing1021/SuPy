@@ -235,6 +235,7 @@ def load_SUEWS_nml_simple(path_file):
         logger_supy.exception(f"{path_file} does not exists!")
 
 
+@functools.lru_cache(maxsize=128)
 def load_SUEWS_nml(p_nml):
     # remove case issues
     # xfile = path_insensitive(xfile)
