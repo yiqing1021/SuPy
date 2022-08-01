@@ -610,8 +610,10 @@ def resample_forcing_met(
     )
 
     # combine the resampled individual dataframes
-    data_met_tstep = pd.concat(
-        [data_met_tstep_inst, data_met_tstep_avg, data_met_tstep_sum], axis=1
+    data_met_tstep = (
+        pd.concat([data_met_tstep_inst, data_met_tstep_avg, data_met_tstep_sum], axis=1)
+        .interpolate()
+        .loc[data_met_tstep_inst.index]
     )
 
     # adjust solar radiation by zenith correction and total amount distribution
@@ -1393,7 +1395,7 @@ def load_SUEWS_InitialCond_df(path_runcontrol):
     logger_supy.debug("incorporating runcontrol numeric entries")
     list_var_dim_from_dict_ModConfig = []
     for var, val in dict_ModConfig.items():
-        if isinstance(val, (float, int, np.int64, np.float64, np.bool_)):
+        if isinstance(val, (float, int, np.number, np.bool_)):
             list_var_dim_from_dict_ModConfig.append((var, 0, val))
         elif isinstance(val, (str)):
             pass
