@@ -45,18 +45,16 @@ def check_range(ser_to_check: pd.Series, rule_var: dict) -> Tuple:
     max_v = np.inf if isinstance(max_v, str) else max_v
     description = ""
     is_accepted_flag = True
+    try:
+        flag_optional=rule_var[var]["optional"]
+    except KeyError:
+        flag_optional=True
 
-    # for ind, value in ser_to_check.items():
-    #     if min_v <= value <= max_v:
-    #         is_accepted_flag = True
-    #     elif value == -999.0:
-    #         # default `na` value as such option is unnecessary in SUEWS
-    #         is_accepted_flag = True
-    #     else:
-    #         is_accepted_flag = False
-    #         description = f"`{var}` should be between [{min_v}, {max_v}] but `{value}` is found at {ind}"
-    #         break
-    ser_flag = ~ser_to_check.replace(-999.0, np.nan).dropna().between(min_v, max_v)
+    # if the parameter is optional and not set, it is accepted
+    ser_to_check_nan=ser_to_check.replace(-999.0, np.nan)
+    if flag_optional:
+        ser_to_check_nan=ser_to_check_nan.dropna()
+    ser_flag = ~ser_to_check_nan.between(min_v, max_v)
     n_flag = ser_flag.sum()
     if ser_flag.sum() > 0:
         is_accepted_flag = False

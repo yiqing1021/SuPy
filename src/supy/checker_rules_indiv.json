@@ -905,6 +905,7 @@
     },
     "kdown": {
         "cat": "grid",
+        "optional": false,
         "logic": "range",
         "param": {
             "max": 1400,
@@ -1251,6 +1252,7 @@
     "pres": {
         "cat": "grid",
         "logic": "range",
+        "optional":false,
         "param": {
             "max": 1300,
             "min": 680
@@ -1353,6 +1355,7 @@
     "rain": {
         "cat": "grid",
         "logic": "range",
+        "optional": false,
         "param": {
             "max": "inf",
             "min": 0
@@ -1391,6 +1394,7 @@
     },
     "RH": {
         "cat": "grid",
+        "optional": false,
         "logic": "range",
         "param": {
             "max": 105,
@@ -1843,6 +1847,7 @@
     "Tair": {
         "cat": "grid",
         "logic": "range",
+        "optional": false,
         "param": {
             "max": 90,
             "min": -60
@@ -2062,6 +2067,7 @@
     "U": {
         "cat": "grid",
         "logic": "range",
+        "optional": false,
         "param": {
             "max": 60,
             "min": 0.0001
