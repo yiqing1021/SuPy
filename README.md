@@ -51,3 +51,66 @@ The above code will produce a plot of surface energy balance components as follo
 
 Please check out [more SuPy tutorials here!](https://supy.readthedocs.io/en/latest/tutorial/tutorial.html)
 
+## Installation of the development version of SuPy
+
+The development version `supy` includes both the `supy` wrapper and its kernel `supy-driver` - the calculation kernel written in Fortran.
+
+All below is supposed to be in a directory named `supy-dev` - which however you can change.
+
+
+1. Get both the source code of SUEWS and SuPy
+
+the development version of SuPy.
+
+``` shell
+# get the source code of SUEWS and SuPy
+git clone git@github.com:UMEP-dev/SUEWS.git
+
+git clone git@github.com:UMEP-dev/SuPy.git
+
+```
+
+2. Set up the conda environment
+
+```shell
+conda env create -f SuPy/env.yml
+conda activate supy
+
+```
+
+3. Compile the kernel `supy-driver`
+
+```shell
+cd SUEWS/supy-driver
+make dev
+
+```
+
+Here you can check if `supy-driver` is installed correctly:
+
+```shell
+pip show supy-driver
+```
+note the `location` field in the output, which should point to the local `supy-driver` directory.
+
+4. Install the dev version of SuPy
+
+```shell
+cd ../../SuPy
+
+pip install -e src
+
+```
+
+similarly, you can check if the dev version of SuPy is installed correctly:
+
+```shell
+pip show supy
+```
+note the `location` field in the output, which should point to the local `supy` directory.
+
+5. Perform a quick self-test
+
+```shell
+make test
+```
