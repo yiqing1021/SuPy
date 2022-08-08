@@ -543,6 +543,8 @@ def resample_linear_avg(data_raw_avg, tstep_in, tstep_mod):
     # shift by half-tstep_in to generate a time series with instantaneous
     # values
     data_raw_shift = data_raw_avg.shift(-tstep_in / 2, freq="S")
+    # print('data_raw_shift.index')
+    # print(data_raw_shift.head())
 
     # re-align the index so after resampling we can have filled heading part
     data_raw_tstep = data_raw_shift.copy()
@@ -550,15 +552,25 @@ def resample_linear_avg(data_raw_avg, tstep_in, tstep_mod):
     data_raw_tstep.loc[t_end, :] = np.nan
     data_raw_tstep = data_raw_tstep.sort_index()
 
+    # get proper timestamps for filling up
+    data_tstep = data_raw_tstep.asfreq(f"{tstep_mod}S")
+
     # insert the shifted
-    idx_comb = data_raw_tstep.index.append(data_raw_shift.index).unique()
+    idx_comb = data_raw_tstep.index.append(data_raw_shift.index).append(data_tstep.index).unique()
     data_raw_tstep = data_raw_tstep.reindex(idx_comb)
     data_raw_tstep = data_raw_tstep.sort_index()
+    # print('data_raw_tstep')
+    # print(data_raw_tstep.head())
 
     # interpolation so to get the instantaneous values
     data_raw_tstep.loc[data_raw_shift.index] = data_raw_shift.values
-    data_raw_tstep = data_raw_tstep.asfreq(f"{tstep_mod}S")
-    data_tstep = data_raw_tstep.interpolate("linear")
+    data_raw_tstep = data_raw_tstep.interpolate(method="linear")
+
+    # transfer the interpolated values to the desired time step
+    data_tstep=data_raw_tstep.loc[data_tstep.index]
+    data_tstep=data_tstep.interpolate(method="linear")
+    # print('data_tstep.head')
+    # print(data_tstep.head())
 
     # fill gaps with valid values
     data_tstep = data_tstep.copy().bfill().ffill().dropna(how="all")
