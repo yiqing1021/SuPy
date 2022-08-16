@@ -2,6 +2,8 @@
 
 from supy_driver import __version__ as sd_ver
 from ._env import path_supy_module
+import json
+import sys
 
 import pandas as pd
 
@@ -12,14 +14,34 @@ __version__ = f"{ser_ver.ver_milestone}.{ser_ver.ver_major}.{ser_ver.ver_minor}{
 __version_driver__ = sd_ver
 
 
-def show_version(mode="simple"):
+def show_version(mode="simple",as_json=False):
     """print `supy` and `supy_driver` version information.
     """
-    print("SuPy versions")
-    print("-------------")
-    print(f"supy: {__version__}")
-    print(f"supy_driver: {__version_driver__}")
-    if mode == "full":
-        print("\n=================")
-        print("SYSTEM DEPENDENCY")
-        pd.show_versions()
+    dict_info_supy = {}
+    dict_info_supy["supy"] = __version__
+    dict_info_supy["supy_driver"] = __version_driver__
+    # dict_info['system'] = {'platform':sys.platform,'python_version':sys.version}
+
+    if as_json:
+        if as_json is True:
+            print(json.dumps(dict_info_supy, indent=2))
+            pd.show_versions(as_json=as_json)
+        else:
+            from pathlib import Path
+            assert isinstance(as_json, str)  # needed for mypy
+            pd.show_versions(as_json=as_json)
+            path_json=Path(as_json)
+            ser_json=pd.read_json(path_json, typ="series", convert_dates=False)
+            ser_info_supy=pd.Series(dict_info_supy)
+            ser_json=pd.concat([ser_info_supy,ser_json],axis=0)
+            ser_json.to_json(path_json,orient='index')
+    else:
+
+        print("SuPy versions")
+        print("-------------")
+        print(f"supy: {__version__}")
+        print(f"supy_driver: {__version_driver__}")
+        if mode == "full":
+            print("\n=================")
+            print("SYSTEM DEPENDENCY")
+            pd.show_versions()
