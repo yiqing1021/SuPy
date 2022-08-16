@@ -1,3 +1,4 @@
+import zipfile
 import supy_driver as sd
 import pandas as pd
 
@@ -91,7 +92,7 @@ def diag_rsl(df_forcing, df_state, df_output, include_rsl=False):
 
 def diag_rsl_prm(df_state, df_output):
     """
-    Diagnose near-surface meteorological variables using RSL scheme as in `suews_driver`.
+    Calculate parameters used in RSL scheme.
 
     Parameters
     ----------
@@ -99,8 +100,6 @@ def diag_rsl_prm(df_state, df_output):
         Model states as used in SuPy run.
     df_output : pandas.Dataframe
         Model output produced by SuPy run.
-    include_rsl : bool, optional
-        Flag to determine if full RSL output at all levels should be included, by default False
 
     Returns
     -------
@@ -142,21 +141,6 @@ def diag_rsl_prm(df_state, df_output):
         print(df_suews.loc[idx])
         print(df_suews.loc[idx, ["z0m", "zdm", "Lob", "QH", "QE"]])
         z0m, zdm, l_mod, qh, qe = df_suews.loc[idx, ["z0m", "zdm", "Lob", "QH", "QE"]]
-        # zh_x = zh.loc[idx]
-        # fai_x = fai.loc[idx]
-        # temp_c, press_hpa, avrh, avu1 = df_forcing.loc[idx, ["Tair", "pres", "RH", "U"]]
-        # (
-        #     lv_j_kg,
-        #     lvs_j_kg,
-        #     es_hpa,
-        #     ea_hpa,
-        #     vpd_hpa,
-        #     vpd_pa,
-        #     dq,
-        #     dens_dry,
-        #     avcp,
-        #     avdens,
-        # ) = sd.atmmoiststab_module.cal_atmmoist(temp_c, press_hpa, avrh, 0.0)
         (
             l_mod_rsl,
             zh_rsl,
@@ -193,3 +177,44 @@ def diag_rsl_prm(df_state, df_output):
     df_prm.index = pd.to_datetime(df_prm.index)
 
     return df_prm
+
+
+def save_zip_debug(df_forcing,df_state_init):
+    import tempfile
+    from pathlib import Path
+
+    from .._version import show_version
+
+    path_dir_save = Path.cwd()
+    path_json_version = path_dir_save / "supy_info.json"
+    try:
+        path_json_version.touch()
+    except Exception:
+        tempdir = tempfile.gettempdir()
+        path_dir_save = Path(tempdir)
+        path_json_version = path_dir_save / path_json_version.name
+
+    # save version info
+    show_version(as_json=path_json_version.as_posix())
+
+    # save forcing data
+    path_forcing = path_dir_save / "df_forcing.pkl"
+    df_forcing.to_pickle(path_forcing)
+
+    # save state data
+    path_state_init = path_dir_save / "df_state_init.pkl"
+    df_state_init.to_pickle(path_state_init)
+
+    # get a random hash to use as a unique identifier for this run
+    import hashlib
+    hash=hashlib.md5(str(path_dir_save).encode('utf-8')).hexdigest()[:8]
+
+    # bundle all files in a zip file
+    path_zip_debug = path_dir_save / f"supy_debug-{hash}.zip"
+    with zipfile.ZipFile(path_zip_debug, 'w') as myzip:
+        myzip.write(path_forcing.as_posix(), arcname=path_forcing.name)
+        myzip.write(path_state_init.as_posix(), arcname=path_state_init.name)
+        myzip.write(path_json_version.as_posix(), arcname=path_json_version.name)
+
+    return path_zip_debug
+

@@ -30,6 +30,8 @@ from ._post import pack_df_output, pack_df_output_array, pack_df_state
 
 from ._env import logger_supy
 
+from .util._debug import save_zip_debug
+
 
 ##############################################################################
 # main calculation
@@ -55,11 +57,10 @@ def suews_cal_tstep(dict_state_start, dict_met_forcing_tstep):
         if var in dict_input:
             pass
         else:
-            print(f'{var} is not in dict_input')
-            print('\n')
+            print(f"{var} is not in dict_input")
+            print("\n")
 
     dict_input = {k: dict_input[k] for k in list_var_input}
-
 
     # main calculation:
     try:
@@ -311,7 +312,15 @@ def run_supy_ser(
                         dict_state_start, met_forcing_tstep
                     )
                 except:
-                    raise RuntimeError("SUEWS kernel error")
+                    # if calculation fails, save the state and output of the previous step
+                    path_zip_debug = save_zip_debug(df_forcing, df_state_init)
+                    raise RuntimeError(
+                        f"\n====================\n"
+                        f"SUEWS kernel error!\n"
+                        f"A zip file for debugging has been saved as `{path_zip_debug.as_posix()}`:"
+                        f"Please report this issue with the above zip file to the developer at"
+                        f" https://github.com/UMEP-dev/SuPy/issues/new?assignees=&labels=&template=issue-report.md."
+                        f"\n====================\n")
 
                 # update output & model state at tstep for the current grid
                 dict_output.update({(tstep, grid): dict_output_tstep})
@@ -372,7 +381,14 @@ def run_supy_ser(
                 list_state_end, list_output_array = zip(*list_res)
 
             except:
-                raise RuntimeError("SUEWS kernel error")
+                path_zip_debug = save_zip_debug(df_forcing, df_state_init)
+                raise RuntimeError(
+                    f"\n====================\n"
+                    f"SUEWS kernel error!\n"
+                    f"A zip file for debugging has been saved as `{path_zip_debug.as_posix()}`:"
+                    f"Please report this issue with the above zip file to the developer at"
+                    f" https://github.com/UMEP-dev/SuPy/issues/new?assignees=&labels=&template=issue-report.md."
+                    f"\n====================\n")
 
             # collect output arrays
             dict_output = {
