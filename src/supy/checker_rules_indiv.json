@@ -1494,24 +1494,6 @@
         },
         "unit": "1"
     },
-    "sfr_roof": {
-        "cat": "grid",
-        "logic": "range",
-        "param": {
-            "max": 10,
-            "min": 0
-        },
-        "unit": "m3"
-    },
-    "sfr_wall": {
-        "cat": "grid",
-        "logic": "range",
-        "param": {
-            "max": 10,
-            "min": 0
-        },
-        "unit": "m3"
-    },
     "smdmethod": {
         "cat": "grid",
         "logic": "method",
