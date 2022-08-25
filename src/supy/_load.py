@@ -1329,7 +1329,7 @@ dict_InitCond_out = {
     "grassstate": 0,
     "bsoilstate": 0,
     "waterstate": 10,
-    "snowinitially": int(nan),
+    "snowinitially": int(0),
     "snowwaterpavedstate": nan,
     "snowwaterbldgsstate": nan,
     "snowwaterevetrstate": nan,
@@ -1511,18 +1511,22 @@ def modify_df_init(df_init, list_var_dim):
 # load Initial Condition variables from namelist file
 def add_file_init_df(df_init):
     # load all nml info from file names:('file_init', '0')
+    print(df_init[("file_init", "0")].values[0])
     df_init_file = (
         df_init[("file_init", "0")].map(lambda fn: load_SUEWS_nml(fn)).apply(pd.Series)
     )
     # df_init_file = pd.concat([df_init_file], axis=1, keys=["0"])
     # df_init_file = df_init_file.swaplevel(0, 1, axis=1)
     df_init_file.index.set_names(["Grid"], inplace=True)
+    # print(df_init_file)
+    # df_init_file.to_pickle('df_init_file.pkl')
 
     # merge only those appeard in base df
     df_init.update(df_init_file)
+    df_init.filter(like='snow').to_pickle('df_init_snow.pkl')
 
     # drop ('file_init', '0') as this may cause non-numeic errors later on
-    df_init = df_init.drop(columns=[("file_init", "0")])
+    # df_init = df_init.drop(columns=[("file_init", "0")])
     return df_init
 
 
@@ -1612,9 +1616,10 @@ def add_veg_init_df(df_init):
 # add surface specific info into `df_init`
 def add_sfc_init_df(df_init):
     # create snow flag
+    ser_snow_use = df_init[("snowuse", "0")]
     ser_snow_init = df_init[("snowinitially", "0")]
     ser_snow_flag = ser_snow_init.where(ser_snow_init == 0, 1)
-    ser_snow_flag = (df_init["snowuse"] * ser_snow_flag)["0"]
+    ser_snow_flag = (ser_snow_use * ser_snow_flag)
 
     # land cover based assignment
     list_sfc = ["paved", "bldgs", "evetr", "dectr", "grass", "bsoil", "water"]
