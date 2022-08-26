@@ -1511,19 +1511,15 @@ def modify_df_init(df_init, list_var_dim):
 # load Initial Condition variables from namelist file
 def add_file_init_df(df_init):
     # load all nml info from file names:('file_init', '0')
-    print(df_init[("file_init", "0")].values[0])
     df_init_file = (
         df_init[("file_init", "0")].map(lambda fn: load_SUEWS_nml(fn)).apply(pd.Series)
     )
     # df_init_file = pd.concat([df_init_file], axis=1, keys=["0"])
     # df_init_file = df_init_file.swaplevel(0, 1, axis=1)
     df_init_file.index.set_names(["Grid"], inplace=True)
-    # print(df_init_file)
-    # df_init_file.to_pickle('df_init_file.pkl')
 
     # merge only those appeard in base df
     df_init.update(df_init_file)
-    df_init.filter(like='snow').to_pickle('df_init_snow.pkl')
 
     # drop ('file_init', '0') as this may cause non-numeic errors later on
     # df_init = df_init.drop(columns=[("file_init", "0")])
