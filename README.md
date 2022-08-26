@@ -78,7 +78,17 @@ conda activate supy
 
 ```
 
-3. Compile the kernel `supy-driver`
+3. Install the dev version of SuPy
+
+```shell
+cd ../../SuPy
+
+pip install -e src
+
+```
+
+
+4. Compile the kernel `supy-driver`
 
 ```shell
 cd SUEWS/supy-driver
@@ -93,24 +103,14 @@ pip show supy-driver
 ```
 note the `location` field in the output, which should point to the local `supy-driver` directory.
 
-4. Install the dev version of SuPy
 
-```shell
-cd ../../SuPy
+Note: after installing the development version of `supy-driver`, you might get the warning about incompatibility, which you can ignore and carry on. However, in case of any issue, please report it [here](https://github.com/UMEP-dev/SuPy/issues/new?assignees=&labels=&template=issue-report.md).
 
-pip install -e src
 
-```
 
-similarly, you can check if the dev version of SuPy is installed correctly:
+5. Check the version info of installed supy
 
 ```shell
 pip show supy
 ```
 note the `location` field in the output, which should point to the local `supy` directory.
-
-5. Perform a quick self-test
-
-```shell
-make test
-```
