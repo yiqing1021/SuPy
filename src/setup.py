@@ -1,11 +1,84 @@
 from setuptools import setup
 import json
+from pathlib import Path
 
-with open("./supy/supy_version.json") as f:
+# write version info using git commit
+import subprocess
+import warnings
+import re
+
+ISRELEASED = False
+# if a release, use strict requirement for supy-driver; otehrwise, use a loose requirement
+DRIVER_REQ = "supy_driver==2021a9" if ISRELEASED else "supy_driver"
+# FULLVERSION += '.dev'
+
+pipe = None
+p_fn_ver = Path("./supy/supy_version.json")
+for cmd in ["git", "git.cmd"]:
+    try:
+        pipe = subprocess.Popen(
+            [cmd, "describe", "--always", "--dirty=-dirty"], stdout=subprocess.PIPE
+        )
+        (so, serr) = pipe.communicate()
+        # parse version info from git
+        list_str_ver = so.decode("utf-8").split("-")
+        if len(list_str_ver) == 1:
+            ver_main = list_str_ver[0]
+        else:
+            ver_main = list_str_ver[0]
+            # number of iterations after ver_main
+            ver_iter = list_str_ver[1]
+            # git commit info
+            ver_git_commit = list_str_ver[2]
+            # if dirty, add 'dev' to version
+            if list_str_ver[-1].lower() == "dirty":
+                ver_note = "dirty"
+            else:
+                ver_note = " "
+        # save version info to json file
+        with open(p_fn_ver, "w") as f:
+            json.dump(
+                {
+                    "version": ver_main+('' if ISRELEASED else '.dev'),
+                    "iter": ver_iter,
+                    "git_commit": ver_git_commit,
+                    "note": ver_note,
+                },
+                f,
+            )
+        if pipe.returncode == 0:
+            break
+    except:
+        pass
+
+if pipe is None or pipe.returncode != 0:
+    # no git, or not in git dir
+
+    if p_fn_ver.exists:
+        warnings.warn(
+            f"WARNING: Couldn't get git revision, using existing {p_fn_ver.as_posix()}"
+        )
+        write_version = False
+    else:
+        warnings.warn(
+            "WARNING: Couldn't get git revision, using generic " "version string"
+        )
+else:
+    # have git, in git dir, but may have used a shallow clone (travis)
+    rev = so.strip()
+    rev = rev.decode("ascii")
+
+    # if not rev.startswith("v") and re.match("[a-zA-Z0-9]{7,9}", rev):
+    #     # partial clone, manually construct version string
+    #     # this is the format before we started using git-describe
+    #     # to get an ordering on dev version strings.
+    #     rev = "v%s.dev-%s" % (VERSION, rev)
+
+with open(p_fn_ver) as f:
     dict_ver = json.load(f)
 
 print(dict_ver)
-__version__ = f"{dict_ver['ver_milestone']}.{dict_ver['ver_major']}.{dict_ver['ver_minor']}{dict_ver['ver_remark']}"
+__version__ = f'{dict_ver["version"]}-{dict_ver["iter"]}-{dict_ver["git_commit"]}-{dict_ver["note"]}'
 
 
 def readme():
@@ -66,7 +139,7 @@ setup(
         "numdifftools",  # required by `lmfit` for uncertainty estimation
         "pvlib",  # TMY-related solar radiation calculations
         "platypus-opt==1.0.4",  # a multi-objective optimiser
-        "supy_driver==2021a9",  # a separate f2py-based driver
+        DRIVER_REQ,  # a separate f2py-based driver
     ],
     extras_require={
         "hdf": [

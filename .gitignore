@@ -133,3 +133,4 @@ src/data_test/*/ERA5_*.txt
 
 Output/
 docs/source/api/supy.util/*.rst
+src/supy/supy_version.json
