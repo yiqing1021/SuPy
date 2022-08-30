@@ -10,7 +10,7 @@ import pandas as pd
 ser_ver = pd.read_json(
     path_supy_module / "supy_version.json", typ="series", convert_dates=False
 )
-__version__ = f"{ser_ver.ver_milestone}.{ser_ver.ver_major}.{ser_ver.ver_minor}{ser_ver.ver_remark}"
+__version__ = f"{ser_ver.version}-{ser_ver.iter}-{ser_ver.git_commit}"
 __version_driver__ = sd_ver
 
 

@@ -14,14 +14,16 @@ DRIVER_REQ = "supy_driver==2021a9" if ISRELEASED else "supy_driver"
 
 pipe = None
 p_fn_ver = Path("./supy/supy_version.json")
-for cmd in ["git", "git.cmd"]:
+for cmd in ["git", "/usr/bin/git", "git.cmd"]:
+
     try:
         pipe = subprocess.Popen(
             [cmd, "describe", "--always", "--dirty=-dirty"], stdout=subprocess.PIPE
         )
         (so, serr) = pipe.communicate()
         # parse version info from git
-        list_str_ver = so.decode("utf-8").split("-")
+        list_str_ver = so.decode("utf-8").strip().split("-")
+
         if len(list_str_ver) == 1:
             ver_main = list_str_ver[0]
         else:
@@ -32,17 +34,14 @@ for cmd in ["git", "git.cmd"]:
             ver_git_commit = list_str_ver[2]
             # if dirty, add 'dev' to version
             if list_str_ver[-1].lower() == "dirty":
-                ver_note = "dirty"
-            else:
-                ver_note = " "
+                ver_git_commit += "-dirty"
         # save version info to json file
         with open(p_fn_ver, "w") as f:
             json.dump(
                 {
-                    "version": ver_main+('' if ISRELEASED else '.dev'),
+                    "version": ver_main + ("" if ISRELEASED else ".dev"),
                     "iter": ver_iter,
                     "git_commit": ver_git_commit,
-                    "note": ver_note,
                 },
                 f,
             )
@@ -54,7 +53,7 @@ for cmd in ["git", "git.cmd"]:
 if pipe is None or pipe.returncode != 0:
     # no git, or not in git dir
 
-    if p_fn_ver.exists:
+    if p_fn_ver.exists():
         warnings.warn(
             f"WARNING: Couldn't get git revision, using existing {p_fn_ver.as_posix()}"
         )
@@ -74,11 +73,15 @@ else:
     #     # to get an ordering on dev version strings.
     #     rev = "v%s.dev-%s" % (VERSION, rev)
 
-with open(p_fn_ver) as f:
-    dict_ver = json.load(f)
+if p_fn_ver.exists():
+    with open(p_fn_ver, "r") as f:
+        dict_ver = json.load(f)
+        ver_main = dict_ver["version"]
+        ver_iter = dict_ver["iter"]
+        ver_git_commit = dict_ver["git_commit"]
 
 print(dict_ver)
-__version__ = f'{dict_ver["version"]}-{dict_ver["iter"]}-{dict_ver["git_commit"]}-{dict_ver["note"]}'
+__version__ = f"{ver_main}-{ver_iter}-{ver_git_commit}"
 
 
 def readme():
