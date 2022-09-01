@@ -489,7 +489,7 @@ def gen_epw(
     path_epw.unlink()
 
     text_meta = """
-LOCATION,Chongqing Shapingba,Chongqing,CHN,CSWD,575160,29.58,106.47,8,259.1
+LOCATION,Chongqing Shapingba,Chongqing,CHN,CSWD,575160,lat,lon,tz,259.1
 DESIGN CONDITIONS,1,Climate Design Data 2009 ASHRAE Handbook,,Heating,1,3.2,4.2,-0.2,3.8,6.5,1.3,4.3,6.2,4.9,7.6,4.3,7.5,1.4,0,Cooling,7,7.4,36.9,25.6,35.5,25.6,34.2,25.4,27.4,32.7,26.9,32.2,26.4,31.6,2.5,110,26.1,22.2,30.2,25.6,21.5,29.8,25.1,20.8,29.3,89.3,32.7,86.9,32.5,84.7,31.7,909,Extremes,5.1,4.3,3.6,35.4,1.1,38.8,1.3,1.6,0.1,40,-0.6,40.9,-1.4,41.8,-2.3,43
 TYPICAL/EXTREME PERIODS,6,Summer - Week Nearest Max Temperature For Period,Extreme,7/27,8/ 2,Summer - Week Nearest Average Temperature For Period,Typical,7/ 6,7/12,Winter - Week Nearest Min Temperature For Period,Extreme,12/22,1/ 5,Winter - Week Nearest Average Temperature For Period,Typical,1/13,1/19,Autumn - Week Nearest Average Temperature For Period,Typical,10/13,10/19,Spring - Week Nearest Average Temperature For Period,Typical,4/12,4/18
 GROUND TEMPERATURES,3,.5,,,,13.31,10.23,9.39,10.12,14.28,18.95,23.34,26.51,27.44,25.95,22.35,17.82,2,,,,16.09,13.20,11.82,11.77,13.97,17.16,20.59,23.54,25.06,24.77,22.74,19.63,4,,,,17.90,15.65,14.27,13.85,14.66,16.52,18.83,21.09,22.62,22.98,22.11,20.29
@@ -499,10 +499,10 @@ COMMENTS 2, none
 DATA PERIODS,1,1,Data,Sunday,1/1,12/31
     """
     text_meta = text_meta.split("\n")[1:-1]
-    #change the default latitude and longitude from args, which will be used to calculate solar position and received direct solar radiation at each surface in EnergyPlus
-    text_meta[0] = text_meta[0].replace('29.58',str(lat)) 
-    text_meta[0] = text_meta[0].replace('106.47',str(lon))
-
+    #change the default latitude, longuitude and timezone from args, which will be used to calculate solar position and received direct solar radiation at each surface in EnergyPlus
+    text_meta[0] = text_meta[0].replace('lat',str(lat)) 
+    text_meta[0] = text_meta[0].replace('lon',str(lon))
+    text_meta[0] = text_meta[0].replace('tz',str(tz))
     # lines = []
     text_epw = "\n".join(text_meta + text_data)
     # with open(path_epw, 'r') as f:
