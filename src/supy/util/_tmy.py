@@ -499,6 +499,10 @@ COMMENTS 2, none
 DATA PERIODS,1,1,Data,Sunday,1/1,12/31
     """
     text_meta = text_meta.split("\n")[1:-1]
+    #change the default latitude and longitude from args, which will be used to calculate solar position and received direct solar radiation at each surface in EnergyPlus
+    text_meta[0] = text_meta[0].replace('29.58',str(lat)) 
+    text_meta[0] = text_meta[0].replace('106.47',str(lon))
+
     # lines = []
     text_epw = "\n".join(text_meta + text_data)
     # with open(path_epw, 'r') as f:
